@@ -1,0 +1,1296 @@
+[
+    {
+        "label": "geopandas",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "geopandas",
+        "description": "geopandas",
+        "detail": "geopandas",
+        "documentation": {}
+    },
+    {
+        "label": "rasterio",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "rasterio",
+        "description": "rasterio",
+        "detail": "rasterio",
+        "documentation": {}
+    },
+    {
+        "label": "mask",
+        "importPath": "rasterio.mask",
+        "description": "rasterio.mask",
+        "isExtraImport": true,
+        "detail": "rasterio.mask",
+        "documentation": {}
+    },
+    {
+        "label": "reproject",
+        "importPath": "rasterio.warp",
+        "description": "rasterio.warp",
+        "isExtraImport": true,
+        "detail": "rasterio.warp",
+        "documentation": {}
+    },
+    {
+        "label": "calculate_default_transform",
+        "importPath": "rasterio.warp",
+        "description": "rasterio.warp",
+        "isExtraImport": true,
+        "detail": "rasterio.warp",
+        "documentation": {}
+    },
+    {
+        "label": "Resampling",
+        "importPath": "rasterio.warp",
+        "description": "rasterio.warp",
+        "isExtraImport": true,
+        "detail": "rasterio.warp",
+        "documentation": {}
+    },
+    {
+        "label": "calculate_default_transform",
+        "importPath": "rasterio.warp",
+        "description": "rasterio.warp",
+        "isExtraImport": true,
+        "detail": "rasterio.warp",
+        "documentation": {}
+    },
+    {
+        "label": "reproject",
+        "importPath": "rasterio.warp",
+        "description": "rasterio.warp",
+        "isExtraImport": true,
+        "detail": "rasterio.warp",
+        "documentation": {}
+    },
+    {
+        "label": "Resampling",
+        "importPath": "rasterio.warp",
+        "description": "rasterio.warp",
+        "isExtraImport": true,
+        "detail": "rasterio.warp",
+        "documentation": {}
+    },
+    {
+        "label": "transform_geom",
+        "importPath": "rasterio.warp",
+        "description": "rasterio.warp",
+        "isExtraImport": true,
+        "detail": "rasterio.warp",
+        "documentation": {}
+    },
+    {
+        "label": "xarray",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "xarray",
+        "description": "xarray",
+        "detail": "xarray",
+        "documentation": {}
+    },
+    {
+        "label": "numpy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "numpy",
+        "description": "numpy",
+        "detail": "numpy",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "urllib.request",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "urllib.request",
+        "description": "urllib.request",
+        "detail": "urllib.request",
+        "documentation": {}
+    },
+    {
+        "label": "warnings",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "warnings",
+        "description": "warnings",
+        "detail": "warnings",
+        "documentation": {}
+    },
+    {
+        "label": "rioxarray",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "rioxarray",
+        "description": "rioxarray",
+        "detail": "rioxarray",
+        "documentation": {}
+    },
+    {
+        "label": "Resampling",
+        "importPath": "rasterio.enums",
+        "description": "rasterio.enums",
+        "isExtraImport": true,
+        "detail": "rasterio.enums",
+        "documentation": {}
+    },
+    {
+        "label": "Resampling",
+        "importPath": "rasterio.enums",
+        "description": "rasterio.enums",
+        "isExtraImport": true,
+        "detail": "rasterio.enums",
+        "documentation": {}
+    },
+    {
+        "label": "Resampling",
+        "importPath": "rasterio.enums",
+        "description": "rasterio.enums",
+        "isExtraImport": true,
+        "detail": "rasterio.enums",
+        "documentation": {}
+    },
+    {
+        "label": "from_bounds",
+        "importPath": "rasterio.transform",
+        "description": "rasterio.transform",
+        "isExtraImport": true,
+        "detail": "rasterio.transform",
+        "documentation": {}
+    },
+    {
+        "label": "from_bounds",
+        "importPath": "rasterio.transform",
+        "description": "rasterio.transform",
+        "isExtraImport": true,
+        "detail": "rasterio.transform",
+        "documentation": {}
+    },
+    {
+        "label": "from_origin",
+        "importPath": "rasterio.transform",
+        "description": "rasterio.transform",
+        "isExtraImport": true,
+        "detail": "rasterio.transform",
+        "documentation": {}
+    },
+    {
+        "label": "rasterize",
+        "importPath": "rasterio.features",
+        "description": "rasterio.features",
+        "isExtraImport": true,
+        "detail": "rasterio.features",
+        "documentation": {}
+    },
+    {
+        "label": "logging",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "logging",
+        "description": "logging",
+        "detail": "logging",
+        "documentation": {}
+    },
+    {
+        "label": "multiprocessing",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "multiprocessing",
+        "description": "multiprocessing",
+        "detail": "multiprocessing",
+        "documentation": {}
+    },
+    {
+        "label": "ProcessPoolExecutor",
+        "importPath": "concurrent.futures",
+        "description": "concurrent.futures",
+        "isExtraImport": true,
+        "detail": "concurrent.futures",
+        "documentation": {}
+    },
+    {
+        "label": "as_completed",
+        "importPath": "concurrent.futures",
+        "description": "concurrent.futures",
+        "isExtraImport": true,
+        "detail": "concurrent.futures",
+        "documentation": {}
+    },
+    {
+        "label": "ProcessPoolExecutor",
+        "importPath": "concurrent.futures",
+        "description": "concurrent.futures",
+        "isExtraImport": true,
+        "detail": "concurrent.futures",
+        "documentation": {}
+    },
+    {
+        "label": "ThreadPoolExecutor",
+        "importPath": "concurrent.futures",
+        "description": "concurrent.futures",
+        "isExtraImport": true,
+        "detail": "concurrent.futures",
+        "documentation": {}
+    },
+    {
+        "label": "as_completed",
+        "importPath": "concurrent.futures",
+        "description": "concurrent.futures",
+        "isExtraImport": true,
+        "detail": "concurrent.futures",
+        "documentation": {}
+    },
+    {
+        "label": "ProcessPoolExecutor",
+        "importPath": "concurrent.futures",
+        "description": "concurrent.futures",
+        "isExtraImport": true,
+        "detail": "concurrent.futures",
+        "documentation": {}
+    },
+    {
+        "label": "as_completed",
+        "importPath": "concurrent.futures",
+        "description": "concurrent.futures",
+        "isExtraImport": true,
+        "detail": "concurrent.futures",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "partial",
+        "importPath": "functools",
+        "description": "functools",
+        "isExtraImport": true,
+        "detail": "functools",
+        "documentation": {}
+    },
+    {
+        "label": "lru_cache",
+        "importPath": "functools",
+        "description": "functools",
+        "isExtraImport": true,
+        "detail": "functools",
+        "documentation": {}
+    },
+    {
+        "label": "partial",
+        "importPath": "functools",
+        "description": "functools",
+        "isExtraImport": true,
+        "detail": "functools",
+        "documentation": {}
+    },
+    {
+        "label": "gc",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "gc",
+        "description": "gc",
+        "detail": "gc",
+        "documentation": {}
+    },
+    {
+        "label": "jit",
+        "importPath": "numba",
+        "description": "numba",
+        "isExtraImport": true,
+        "detail": "numba",
+        "documentation": {}
+    },
+    {
+        "label": "prange",
+        "importPath": "numba",
+        "description": "numba",
+        "isExtraImport": true,
+        "detail": "numba",
+        "documentation": {}
+    },
+    {
+        "label": "psutil",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "psutil",
+        "description": "psutil",
+        "detail": "psutil",
+        "documentation": {}
+    },
+    {
+        "label": "richdem",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "richdem",
+        "description": "richdem",
+        "detail": "richdem",
+        "documentation": {}
+    },
+    {
+        "label": "h5py",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "h5py",
+        "description": "h5py",
+        "detail": "h5py",
+        "documentation": {}
+    },
+    {
+        "label": "glob",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "glob",
+        "description": "glob",
+        "detail": "glob",
+        "documentation": {}
+    },
+    {
+        "label": "netCDF4",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "netCDF4",
+        "description": "netCDF4",
+        "detail": "netCDF4",
+        "documentation": {}
+    },
+    {
+        "label": "Dataset",
+        "importPath": "netCDF4",
+        "description": "netCDF4",
+        "isExtraImport": true,
+        "detail": "netCDF4",
+        "documentation": {}
+    },
+    {
+        "label": "num2date",
+        "importPath": "netCDF4",
+        "description": "netCDF4",
+        "isExtraImport": true,
+        "detail": "netCDF4",
+        "documentation": {}
+    },
+    {
+        "label": "Dataset",
+        "importPath": "netCDF4",
+        "description": "netCDF4",
+        "isExtraImport": true,
+        "detail": "netCDF4",
+        "documentation": {}
+    },
+    {
+        "label": "matplotlib.pyplot",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "matplotlib.pyplot",
+        "description": "matplotlib.pyplot",
+        "detail": "matplotlib.pyplot",
+        "documentation": {}
+    },
+    {
+        "label": "prep",
+        "importPath": "shapely.prepared",
+        "description": "shapely.prepared",
+        "isExtraImport": true,
+        "detail": "shapely.prepared",
+        "documentation": {}
+    },
+    {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
+        "label": "Polygon",
+        "importPath": "shapely.geometry",
+        "description": "shapely.geometry",
+        "isExtraImport": true,
+        "detail": "shapely.geometry",
+        "documentation": {}
+    },
+    {
+        "label": "mapping",
+        "importPath": "shapely.geometry",
+        "description": "shapely.geometry",
+        "isExtraImport": true,
+        "detail": "shapely.geometry",
+        "documentation": {}
+    },
+    {
+        "label": "Point",
+        "importPath": "shapely.geometry",
+        "description": "shapely.geometry",
+        "isExtraImport": true,
+        "detail": "shapely.geometry",
+        "documentation": {}
+    },
+    {
+        "label": "Point",
+        "importPath": "shapely.geometry",
+        "description": "shapely.geometry",
+        "isExtraImport": true,
+        "detail": "shapely.geometry",
+        "documentation": {}
+    },
+    {
+        "label": "CRS",
+        "importPath": "pyproj",
+        "description": "pyproj",
+        "isExtraImport": true,
+        "detail": "pyproj",
+        "documentation": {}
+    },
+    {
+        "label": "Transformer",
+        "importPath": "pyproj",
+        "description": "pyproj",
+        "isExtraImport": true,
+        "detail": "pyproj",
+        "documentation": {}
+    },
+    {
+        "label": "zoom",
+        "importPath": "scipy.ndimage",
+        "description": "scipy.ndimage",
+        "isExtraImport": true,
+        "detail": "scipy.ndimage",
+        "documentation": {}
+    },
+    {
+        "label": "zoom",
+        "importPath": "scipy.ndimage",
+        "description": "scipy.ndimage",
+        "isExtraImport": true,
+        "detail": "scipy.ndimage",
+        "documentation": {}
+    },
+    {
+        "label": "zoom",
+        "importPath": "scipy.ndimage",
+        "description": "scipy.ndimage",
+        "isExtraImport": true,
+        "detail": "scipy.ndimage",
+        "documentation": {}
+    },
+    {
+        "label": "RegularGridInterpolator",
+        "importPath": "scipy.interpolate",
+        "description": "scipy.interpolate",
+        "isExtraImport": true,
+        "detail": "scipy.interpolate",
+        "documentation": {}
+    },
+    {
+        "label": "griddata",
+        "importPath": "scipy.interpolate",
+        "description": "scipy.interpolate",
+        "isExtraImport": true,
+        "detail": "scipy.interpolate",
+        "documentation": {}
+    },
+    {
+        "label": "RegularGridInterpolator",
+        "importPath": "scipy.interpolate",
+        "description": "scipy.interpolate",
+        "isExtraImport": true,
+        "detail": "scipy.interpolate",
+        "documentation": {}
+    },
+    {
+        "label": "griddata",
+        "importPath": "scipy.interpolate",
+        "description": "scipy.interpolate",
+        "isExtraImport": true,
+        "detail": "scipy.interpolate",
+        "documentation": {}
+    },
+    {
+        "label": "CRS",
+        "importPath": "rasterio.crs",
+        "description": "rasterio.crs",
+        "isExtraImport": true,
+        "detail": "rasterio.crs",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "date",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "hashlib",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "hashlib",
+        "description": "hashlib",
+        "detail": "hashlib",
+        "documentation": {}
+    },
+    {
+        "label": "pandas",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pandas",
+        "description": "pandas",
+        "detail": "pandas",
+        "documentation": {}
+    },
+    {
+        "label": "tqdm",
+        "importPath": "tqdm",
+        "description": "tqdm",
+        "isExtraImport": true,
+        "detail": "tqdm",
+        "documentation": {}
+    },
+    {
+        "label": "tqdm",
+        "importPath": "tqdm",
+        "description": "tqdm",
+        "isExtraImport": true,
+        "detail": "tqdm",
+        "documentation": {}
+    },
+    {
+        "label": "tqdm",
+        "importPath": "tqdm",
+        "description": "tqdm",
+        "isExtraImport": true,
+        "detail": "tqdm",
+        "documentation": {}
+    },
+    {
+        "label": "scipy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "scipy",
+        "description": "scipy",
+        "detail": "scipy",
+        "documentation": {}
+    },
+    {
+        "label": "cKDTree",
+        "importPath": "scipy.spatial",
+        "description": "scipy.spatial",
+        "isExtraImport": true,
+        "detail": "scipy.spatial",
+        "documentation": {}
+    },
+    {
+        "label": "zipfile",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "zipfile",
+        "description": "zipfile",
+        "detail": "zipfile",
+        "documentation": {}
+    },
+    {
+        "label": "tempfile",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "tempfile",
+        "description": "tempfile",
+        "detail": "tempfile",
+        "documentation": {}
+    },
+    {
+        "label": "merge",
+        "importPath": "rasterio.merge",
+        "description": "rasterio.merge",
+        "isExtraImport": true,
+        "detail": "rasterio.merge",
+        "documentation": {}
+    },
+    {
+        "label": "extract_and_merge_img",
+        "kind": 2,
+        "importPath": "warning.CLCDandDEM_cliptoNC",
+        "description": "warning.CLCDandDEM_cliptoNC",
+        "peekOfCode": "def extract_and_merge_img(shp_path, tiff_path, output_nc_path, output_tif_path):\n    # 读取矢量数据\n    gdf = gpd.read_file(shp_path)\n    with rasterio.open(tiff_path) as src:\n        # 将shapefile投影为与raster一致的坐标系\n        gdf = gdf.to_crs(src.crs)\n        # 进行裁剪（原始投影）\n        try:\n            img_data, out_transform = mask(src, gdf.geometry, crop=True)\n        except ValueError:",
+        "detail": "warning.CLCDandDEM_cliptoNC",
+        "documentation": {}
+    },
+    {
+        "label": "getnc",
+        "kind": 2,
+        "importPath": "warning.cldas_dowmload_data",
+        "description": "warning.cldas_dowmload_data",
+        "peekOfCode": "def getnc(dataList, localPath):\n    if not os.path.exists(localPath):  # 新建文件夹\n        os.mkdir(localPath)\n    with open(dataList,'r') as f:\n        lines = f.readlines()\n        for line in lines:\n            file_name = line.split('?')[0]  # 文件名\n            file_name_1 = file_name.split('/')[-1]\n            print(file_name_1)\n            urllib.request.urlretrieve(line, localPath +'\\{}'.format(file_name_1))",
+        "detail": "warning.cldas_dowmload_data",
+        "documentation": {}
+    },
+    {
+        "label": "UltraFastNCResampler",
+        "kind": 6,
+        "importPath": "warning.data_normalization_0728",
+        "description": "warning.data_normalization_0728",
+        "peekOfCode": "class UltraFastNCResampler:\n    def __init__(self, target_resolution, clip_shapefile, output_dir, n_workers=None, memory_limit_gb=32):\n        \"\"\"\n        极速NC文件重采样和裁剪处理器\n        Parameters:\n        -----------\n        target_resolution : str\n            目标分辨率 (如 \"1000m\")\n        clip_shapefile : str\n            裁剪用的shapefile路径",
+        "detail": "warning.data_normalization_0728",
+        "documentation": {}
+    },
+    {
+        "label": "fast_bilinear_resample",
+        "kind": 2,
+        "importPath": "warning.data_normalization_0728",
+        "description": "warning.data_normalization_0728",
+        "peekOfCode": "def fast_bilinear_resample(data, x_indices, y_indices, x_weights, y_weights, output_shape):\n    \"\"\"使用numba优化的双线性插值\"\"\"\n    output = np.full(output_shape, np.nan, dtype=np.float32)\n    for i in prange(output_shape[0]):\n        for j in prange(output_shape[1]):\n            yi = y_indices[i, j]\n            xi = x_indices[i, j]\n            if yi >= 0 and xi >= 0 and yi < data.shape[0]-1 and xi < data.shape[1]-1:\n                yw = y_weights[i, j]\n                xw = x_weights[i, j]",
+        "detail": "warning.data_normalization_0728",
+        "documentation": {}
+    },
+    {
+        "label": "fast_nearest_resample",
+        "kind": 2,
+        "importPath": "warning.data_normalization_0728",
+        "description": "warning.data_normalization_0728",
+        "peekOfCode": "def fast_nearest_resample(data, x_indices, y_indices, output_shape):\n    \"\"\"使用numba优化的最近邻插值\"\"\"\n    output = np.full(output_shape, np.nan, dtype=np.float32)\n    for i in prange(output_shape[0]):\n        for j in prange(output_shape[1]):\n            yi = int(np.round(y_indices[i, j]))\n            xi = int(np.round(x_indices[i, j]))\n            if 0 <= yi < data.shape[0] and 0 <= xi < data.shape[1]:\n                output[i, j] = data[yi, xi]\n    return output",
+        "detail": "warning.data_normalization_0728",
+        "documentation": {}
+    },
+    {
+        "label": "ultra_fast_worker",
+        "kind": 2,
+        "importPath": "warning.data_normalization_0728",
+        "description": "warning.data_normalization_0728",
+        "peekOfCode": "def ultra_fast_worker(nc_file, target_resolution, clip_shapefile, output_dir, resample_method, skip_existing):\n    \"\"\"极速工作进程\"\"\"\n    try:\n        # 创建临时处理器\n        processor = UltraFastNCResampler(\n            target_resolution=target_resolution,\n            clip_shapefile=clip_shapefile,\n            output_dir=output_dir,\n            n_workers=1  # 工作进程内部不再并行\n        )",
+        "detail": "warning.data_normalization_0728",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "warning.data_normalization_0728",
+        "description": "warning.data_normalization_0728",
+        "peekOfCode": "logger = logging.getLogger(__name__)\n# 禁用警告\nwarnings.filterwarnings('ignore')\n@jit(nopython=True, parallel=True, cache=True)\ndef fast_bilinear_resample(data, x_indices, y_indices, x_weights, y_weights, output_shape):\n    \"\"\"使用numba优化的双线性插值\"\"\"\n    output = np.full(output_shape, np.nan, dtype=np.float32)\n    for i in prange(output_shape[0]):\n        for j in prange(output_shape[1]):\n            yi = y_indices[i, j]",
+        "detail": "warning.data_normalization_0728",
+        "documentation": {}
+    },
+    {
+        "label": "derive_slope_aspect_from_dem",
+        "kind": 2,
+        "importPath": "warning.DEM2SlopeandAspect",
+        "description": "warning.DEM2SlopeandAspect",
+        "peekOfCode": "def derive_slope_aspect_from_dem(dem_path, slope_tif_path, aspect_tif_path, slope_nc_path, aspect_nc_path):\n    # 1. 读取DEM数据\n    with rasterio.open(dem_path) as src:\n        dem_data = src.read(1)\n        dem_transform = src.transform\n        dem_crs = src.crs\n        dem_profile = src.profile\n    # 2. 用 richdem 计算坡度和坡向（单位为度）\n    dem_rd = rd.rdarray(dem_data, no_data=dem_profile['nodata'])\n    dem_rd.projection = str(dem_crs)",
+        "detail": "warning.DEM2SlopeandAspect",
+        "documentation": {}
+    },
+    {
+        "label": "file_path",
+        "kind": 5,
+        "importPath": "warning.h5_var",
+        "description": "warning.h5_var",
+        "peekOfCode": "file_path = 'SMAP/SPL4SMGP/SMAP/SMAP_L4_SM_gph_20171231T223000_Vv8010_001.h5'  # 替换为你具体的文件名\nwith h5py.File(file_path, 'r') as f:\n    def printname(name):\n        print(name)\n    f.visit(printname)",
+        "detail": "warning.h5_var",
+        "documentation": {}
+    },
+    {
+        "label": "clip_shapefile",
+        "kind": 5,
+        "importPath": "warning.modis_lst_clip",
+        "description": "warning.modis_lst_clip",
+        "peekOfCode": "clip_shapefile = 'G:\\\\Agr-qu\\\\clip.shp'\ninput_dir = 'G:\\\\CNN_SpatialDownscaling\\\\MODIS11\\\\2018'\noutput_dir = 'G:\\\\CNN_SpatialDownscaling\\\\MODIS11\\\\2018_clip'\nos.makedirs(output_dir, exist_ok=True)\nclip_gdf = gpd.read_file(clip_shapefile).to_crs('EPSG:4326')\nfor nc_path in glob.glob(os.path.join(input_dir, '*.nc')):\n    ds = xr.open_dataset(nc_path)\n    for var in ds.data_vars:\n        if set(['lat', 'lon']).issubset(ds[var].dims):\n            da = ds[var].rio.write_crs('EPSG:4326', inplace=False)",
+        "detail": "warning.modis_lst_clip",
+        "documentation": {}
+    },
+    {
+        "label": "input_dir",
+        "kind": 5,
+        "importPath": "warning.modis_lst_clip",
+        "description": "warning.modis_lst_clip",
+        "peekOfCode": "input_dir = 'G:\\\\CNN_SpatialDownscaling\\\\MODIS11\\\\2018'\noutput_dir = 'G:\\\\CNN_SpatialDownscaling\\\\MODIS11\\\\2018_clip'\nos.makedirs(output_dir, exist_ok=True)\nclip_gdf = gpd.read_file(clip_shapefile).to_crs('EPSG:4326')\nfor nc_path in glob.glob(os.path.join(input_dir, '*.nc')):\n    ds = xr.open_dataset(nc_path)\n    for var in ds.data_vars:\n        if set(['lat', 'lon']).issubset(ds[var].dims):\n            da = ds[var].rio.write_crs('EPSG:4326', inplace=False)\n            da_clipped = da.rio.clip(clip_gdf.geometry, clip_gdf.crs, drop=True, invert=False)",
+        "detail": "warning.modis_lst_clip",
+        "documentation": {}
+    },
+    {
+        "label": "output_dir",
+        "kind": 5,
+        "importPath": "warning.modis_lst_clip",
+        "description": "warning.modis_lst_clip",
+        "peekOfCode": "output_dir = 'G:\\\\CNN_SpatialDownscaling\\\\MODIS11\\\\2018_clip'\nos.makedirs(output_dir, exist_ok=True)\nclip_gdf = gpd.read_file(clip_shapefile).to_crs('EPSG:4326')\nfor nc_path in glob.glob(os.path.join(input_dir, '*.nc')):\n    ds = xr.open_dataset(nc_path)\n    for var in ds.data_vars:\n        if set(['lat', 'lon']).issubset(ds[var].dims):\n            da = ds[var].rio.write_crs('EPSG:4326', inplace=False)\n            da_clipped = da.rio.clip(clip_gdf.geometry, clip_gdf.crs, drop=True, invert=False)\n            if da_clipped.size == 0 or da_clipped.shape[0] == 0 or da_clipped.shape[1] == 0:",
+        "detail": "warning.modis_lst_clip",
+        "documentation": {}
+    },
+    {
+        "label": "clip_gdf",
+        "kind": 5,
+        "importPath": "warning.modis_lst_clip",
+        "description": "warning.modis_lst_clip",
+        "peekOfCode": "clip_gdf = gpd.read_file(clip_shapefile).to_crs('EPSG:4326')\nfor nc_path in glob.glob(os.path.join(input_dir, '*.nc')):\n    ds = xr.open_dataset(nc_path)\n    for var in ds.data_vars:\n        if set(['lat', 'lon']).issubset(ds[var].dims):\n            da = ds[var].rio.write_crs('EPSG:4326', inplace=False)\n            da_clipped = da.rio.clip(clip_gdf.geometry, clip_gdf.crs, drop=True, invert=False)\n            if da_clipped.size == 0 or da_clipped.shape[0] == 0 or da_clipped.shape[1] == 0:\n                # 完全不重叠，生成全NaN\n                minx, miny, maxx, maxy = clip_gdf.total_bounds",
+        "detail": "warning.modis_lst_clip",
+        "documentation": {}
+    },
+    {
+        "label": "separate_by_time_var",
+        "kind": 2,
+        "importPath": "warning.modis_separate_by_time",
+        "description": "warning.modis_separate_by_time",
+        "peekOfCode": "def separate_by_time_var(ds, time_var_name, data_var, output_dir, prefix):\n    time_var = ds.variables[time_var_name]\n    times = num2date(time_var[:], units=time_var.units)\n    data = data_var[:]  # shape: (time, height, width)\n    days = np.array([t.replace(hour=0, minute=0, second=0, microsecond=0) for t in times])\n    unique_days = np.unique(days)\n    for day in unique_days:\n        idx = np.where(days == day)[0]\n        if len(idx) == 0:\n            continue",
+        "detail": "warning.modis_separate_by_time",
+        "documentation": {}
+    },
+    {
+        "label": "separate_modis_by_time",
+        "kind": 2,
+        "importPath": "warning.modis_separate_by_time",
+        "description": "warning.modis_separate_by_time",
+        "peekOfCode": "def separate_modis_by_time(nc_path, output_dir):\n    \"\"\"\n    按24小时分组分离MODIS像元，支持Hight_view_time和Day_view_time\n    :param nc_path: MODIS NC 文件路径\n    :param output_dir: 输出目录\n    \"\"\"\n    if not os.path.exists(output_dir):\n        os.makedirs(output_dir)\n    with Dataset(nc_path, 'r') as ds:\n        data_var = ds.variables['data']  # shape: (time, height, width)",
+        "detail": "warning.modis_separate_by_time",
+        "documentation": {}
+    },
+    {
+        "label": "data_dir",
+        "kind": 5,
+        "importPath": "warning.process_netCDF",
+        "description": "warning.process_netCDF",
+        "peekOfCode": "data_dir = r'g:\\\\CNN_SpatialDownscaling\\\\MYD11\\\\2018'\n# 设置保存统计图的目录\noutput_dir = os.path.join(data_dir, '..', 'MYD11')\nos.makedirs(output_dir, exist_ok=True)  # 如果目录不存在则创建\n# 获取目录下所有 .nc 文件，并排序\nfile_list = sorted(glob.glob(os.path.join(data_dir, '*.nc')))\n# 只处理前 17 个文件\nfile_list = file_list[:17]\nday_all = []\nnight_all = []",
+        "detail": "warning.process_netCDF",
+        "documentation": {}
+    },
+    {
+        "label": "output_dir",
+        "kind": 5,
+        "importPath": "warning.process_netCDF",
+        "description": "warning.process_netCDF",
+        "peekOfCode": "output_dir = os.path.join(data_dir, '..', 'MYD11')\nos.makedirs(output_dir, exist_ok=True)  # 如果目录不存在则创建\n# 获取目录下所有 .nc 文件，并排序\nfile_list = sorted(glob.glob(os.path.join(data_dir, '*.nc')))\n# 只处理前 17 个文件\nfile_list = file_list[:17]\nday_all = []\nnight_all = []\nfor i, f in enumerate(file_list):\n    nc = Dataset(f, 'r')",
+        "detail": "warning.process_netCDF",
+        "documentation": {}
+    },
+    {
+        "label": "file_list",
+        "kind": 5,
+        "importPath": "warning.process_netCDF",
+        "description": "warning.process_netCDF",
+        "peekOfCode": "file_list = sorted(glob.glob(os.path.join(data_dir, '*.nc')))\n# 只处理前 17 个文件\nfile_list = file_list[:17]\nday_all = []\nnight_all = []\nfor i, f in enumerate(file_list):\n    nc = Dataset(f, 'r')\n    # 打印当前文件的变量信息\n    #print(f\"File {i + 1}: {f}\")\n    #print(\"Variables:\", list(nc.variables.keys()))",
+        "detail": "warning.process_netCDF",
+        "documentation": {}
+    },
+    {
+        "label": "file_list",
+        "kind": 5,
+        "importPath": "warning.process_netCDF",
+        "description": "warning.process_netCDF",
+        "peekOfCode": "file_list = file_list[:17]\nday_all = []\nnight_all = []\nfor i, f in enumerate(file_list):\n    nc = Dataset(f, 'r')\n    # 打印当前文件的变量信息\n    #print(f\"File {i + 1}: {f}\")\n    #print(\"Variables:\", list(nc.variables.keys()))\n    day_data = np.array(nc.variables['Day_view_time'][:]).flatten()\n    night_data = np.array(nc.variables['Night_view_time'][:]).flatten()",
+        "detail": "warning.process_netCDF",
+        "documentation": {}
+    },
+    {
+        "label": "day_all",
+        "kind": 5,
+        "importPath": "warning.process_netCDF",
+        "description": "warning.process_netCDF",
+        "peekOfCode": "day_all = []\nnight_all = []\nfor i, f in enumerate(file_list):\n    nc = Dataset(f, 'r')\n    # 打印当前文件的变量信息\n    #print(f\"File {i + 1}: {f}\")\n    #print(\"Variables:\", list(nc.variables.keys()))\n    day_data = np.array(nc.variables['Day_view_time'][:]).flatten()\n    night_data = np.array(nc.variables['Night_view_time'][:]).flatten()\n    nc.close()",
+        "detail": "warning.process_netCDF",
+        "documentation": {}
+    },
+    {
+        "label": "night_all",
+        "kind": 5,
+        "importPath": "warning.process_netCDF",
+        "description": "warning.process_netCDF",
+        "peekOfCode": "night_all = []\nfor i, f in enumerate(file_list):\n    nc = Dataset(f, 'r')\n    # 打印当前文件的变量信息\n    #print(f\"File {i + 1}: {f}\")\n    #print(\"Variables:\", list(nc.variables.keys()))\n    day_data = np.array(nc.variables['Day_view_time'][:]).flatten()\n    night_data = np.array(nc.variables['Night_view_time'][:]).flatten()\n    nc.close()\n    # 计算当前文件的中间 50% 落点范围",
+        "detail": "warning.process_netCDF",
+        "documentation": {}
+    },
+    {
+        "label": "day_all",
+        "kind": 5,
+        "importPath": "warning.process_netCDF",
+        "description": "warning.process_netCDF",
+        "peekOfCode": "day_all = np.array(day_all)\nnight_all = np.array(night_all)\n# 计算中间 50% 落点范围 (25% 到 75%分位)\nday_q25, day_q75 = np.percentile(day_all, [25, 75])\nnight_q25, night_q75 = np.percentile(night_all, [25, 75])\n# 分别绘制 Day_view_time 统计图\nfig_day, ax_day = plt.subplots(figsize=(7, 6))\nax_day.hist(day_all, bins=50, color='skyblue', edgecolor='black')\nax_day.set_title('Day_view_time Frequency')\nax_day.set_xlabel('Value')",
+        "detail": "warning.process_netCDF",
+        "documentation": {}
+    },
+    {
+        "label": "night_all",
+        "kind": 5,
+        "importPath": "warning.process_netCDF",
+        "description": "warning.process_netCDF",
+        "peekOfCode": "night_all = np.array(night_all)\n# 计算中间 50% 落点范围 (25% 到 75%分位)\nday_q25, day_q75 = np.percentile(day_all, [25, 75])\nnight_q25, night_q75 = np.percentile(night_all, [25, 75])\n# 分别绘制 Day_view_time 统计图\nfig_day, ax_day = plt.subplots(figsize=(7, 6))\nax_day.hist(day_all, bins=50, color='skyblue', edgecolor='black')\nax_day.set_title('Day_view_time Frequency')\nax_day.set_xlabel('Value')\nax_day.set_ylabel('Frequency')",
+        "detail": "warning.process_netCDF",
+        "documentation": {}
+    },
+    {
+        "label": "filter_and_report_gst_files",
+        "kind": 2,
+        "importPath": "CLDAS_process_nc4_files",
+        "description": "CLDAS_process_nc4_files",
+        "peekOfCode": "def filter_and_report_gst_files(nc4_files, output_txt_path=None):\n    \"\"\"\n    剔除文件名中GST后年月日小时完全重复的文件，只保留每组的第一个。\n    同时统计所有可能的时间点，输出缺失时间点到txt。\n    返回保留的文件路径列表。\n    \"\"\"\n    import collections\n    from datetime import datetime, timedelta\n    seen = set()\n    filtered = []",
+        "detail": "CLDAS_process_nc4_files",
+        "documentation": {}
+    },
+    {
+        "label": "filter_gst_duplicate_files",
+        "kind": 2,
+        "importPath": "CLDAS_process_nc4_files",
+        "description": "CLDAS_process_nc4_files",
+        "peekOfCode": "def filter_gst_duplicate_files(nc4_files):\n    \"\"\"\n    剔除文件名中GST后年月日小时完全重复的文件，只保留每组的第一个。\n    返回保留的文件路径列表。\n    \"\"\"\n    seen = set()\n    filtered = []\n    for fp in nc4_files:\n        fname = os.path.basename(fp)\n        # 匹配GST-后8位日期+2位小时",
+        "detail": "CLDAS_process_nc4_files",
+        "documentation": {}
+    },
+    {
+        "label": "clean_filename",
+        "kind": 2,
+        "importPath": "CLDAS_process_nc4_files",
+        "description": "CLDAS_process_nc4_files",
+        "peekOfCode": "def clean_filename(filename):\n    \"\"\"移除文件名中的(1), (2)等标记\"\"\"\n    base, ext = os.path.splitext(filename)\n    clean_base = re.sub(r'\\(\\d+\\)$', '', base)\n    return clean_base + ext\ndef delete_duplicate_files(file_path, output_dir = None ):\n    \"\"\"\n    删除文件名中GST后年月日小时完全重复的文件，只保留每组的第一个。\n    返回保留的文件路径列表。\n    \"\"\"",
+        "detail": "CLDAS_process_nc4_files",
+        "documentation": {}
+    },
+    {
+        "label": "delete_duplicate_files",
+        "kind": 2,
+        "importPath": "CLDAS_process_nc4_files",
+        "description": "CLDAS_process_nc4_files",
+        "peekOfCode": "def delete_duplicate_files(file_path, output_dir = None ):\n    \"\"\"\n    删除文件名中GST后年月日小时完全重复的文件，只保留每组的第一个。\n    返回保留的文件路径列表。\n    \"\"\"\n        # 查找所有nc文件\n    search_pattern = os.path.join(file_path, '*.nc')\n    print(f\"搜索模式: {search_pattern}\")\n    nc4_files = glob.glob(search_pattern)\n    print(f\"找到 {len(nc4_files)} 个nc文件\")",
+        "detail": "CLDAS_process_nc4_files",
+        "documentation": {}
+    },
+    {
+        "label": "process_nc4_files",
+        "kind": 2,
+        "importPath": "CLDAS_process_nc4_files",
+        "description": "CLDAS_process_nc4_files",
+        "peekOfCode": "def process_nc4_files(input_dir, output_dir, shp_path, lat_range=[20, 50], lon_range=[70, 140]):\n    \"\"\"\n    处理nc文件：使用shp文件裁剪数据\n    shp_path: shapefile路径\n    lat_range: 纬度范围 [最小值, 最大值]\n    lon_range: 经度范围 [最小值, 最大值]\n    \"\"\"\n    print(f\"开始处理文件夹: {input_dir}\")\n    print(f\"输出文件夹: {output_dir}\")\n    print(f\"使用裁剪文件: {shp_path}\")",
+        "detail": "CLDAS_process_nc4_files",
+        "documentation": {}
+    },
+    {
+        "label": "shp_path",
+        "kind": 5,
+        "importPath": "create_clip_shp",
+        "description": "create_clip_shp",
+        "peekOfCode": "shp_path = r'G:\\Agr-qu\\clip.shp'\n# 定义面范围（左下、左上、右上、右下、左下）\npolygon = Polygon([\n    (110.0, 27.0),  # 西南\n    (110.0, 43.0),  # 西北\n    (125.0, 43.0),  # 东北\n    (125.0, 27.0),  # 东南\n    (110.0, 27.0)   # 回到西南\n])\ngdf = gpd.GeoDataFrame({'geometry': [polygon]}, crs='EPSG:4326')",
+        "detail": "create_clip_shp",
+        "documentation": {}
+    },
+    {
+        "label": "polygon",
+        "kind": 5,
+        "importPath": "create_clip_shp",
+        "description": "create_clip_shp",
+        "peekOfCode": "polygon = Polygon([\n    (110.0, 27.0),  # 西南\n    (110.0, 43.0),  # 西北\n    (125.0, 43.0),  # 东北\n    (125.0, 27.0),  # 东南\n    (110.0, 27.0)   # 回到西南\n])\ngdf = gpd.GeoDataFrame({'geometry': [polygon]}, crs='EPSG:4326')\n# 如果文件存在则删除\nif os.path.exists(shp_path):",
+        "detail": "create_clip_shp",
+        "documentation": {}
+    },
+    {
+        "label": "gdf",
+        "kind": 5,
+        "importPath": "create_clip_shp",
+        "description": "create_clip_shp",
+        "peekOfCode": "gdf = gpd.GeoDataFrame({'geometry': [polygon]}, crs='EPSG:4326')\n# 如果文件存在则删除\nif os.path.exists(shp_path):\n    os.remove(shp_path)\ngdf.to_file(shp_path)",
+        "detail": "create_clip_shp",
+        "documentation": {}
+    },
+    {
+        "label": "NCResampler",
+        "kind": 6,
+        "importPath": "era5_data_normalization",
+        "description": "era5_data_normalization",
+        "peekOfCode": "class NCResampler:\n    def __init__(self, target_resolution, clip_shapefile, output_dir, n_workers=None, chunk_size=None, use_fast_resample=True):\n        \"\"\"\n        NC文件重采样和裁剪处理器（性能优化版）\n        Parameters:\n        -----------\n        target_resolution : float, tuple, or str\n            目标分辨率\n        clip_shapefile : str\n            裁剪用的shapefile路径",
+        "detail": "era5_data_normalization",
+        "documentation": {}
+    },
+    {
+        "label": "process_single_file_worker",
+        "kind": 2,
+        "importPath": "era5_data_normalization",
+        "description": "era5_data_normalization",
+        "peekOfCode": "def process_single_file_worker(nc_file, target_resolution, clip_shapefile, output_dir, target_crs, resample_method, use_fast_resample, skip_existing):\n    \"\"\"工作进程函数（用于并行处理）\"\"\"\n    try:\n        # 在工作进程中重新创建处理器实例\n        x_resolution, x_unit, y_resolution, y_unit = target_resolution\n        # 创建临时处理器\n        temp_resampler = NCResampler.__new__(NCResampler)\n        temp_resampler.x_resolution = x_resolution\n        temp_resampler.x_unit = x_unit\n        temp_resampler.y_resolution = y_resolution",
+        "detail": "era5_data_normalization",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "era5_data_normalization",
+        "description": "era5_data_normalization",
+        "peekOfCode": "logger = logging.getLogger(__name__)\n# 禁用dask相关警告\nwarnings.filterwarnings('ignore', category=UserWarning, module='xarray')\nclass NCResampler:\n    def __init__(self, target_resolution, clip_shapefile, output_dir, n_workers=None, chunk_size=None, use_fast_resample=True):\n        \"\"\"\n        NC文件重采样和裁剪处理器（性能优化版）\n        Parameters:\n        -----------\n        target_resolution : float, tuple, or str",
+        "detail": "era5_data_normalization",
+        "documentation": {}
+    },
+    {
+        "label": "get_base_raster_info",
+        "kind": 2,
+        "importPath": "get_same_size",
+        "description": "get_same_size",
+        "peekOfCode": "def get_base_raster_info(data_path, var_name):\n    \"\"\"\n    从指定的 NetCDF 文件中获取基准栅格信息，若缺失则手动设置。\n    该信息（transform, crs, height, width）将用于统一所有其他栅格数据。\n    \"\"\"\n    with xr.open_dataset(data_path) as ds:\n        # 检查指定的变量名是否存在\n        if var_name not in ds.variables:\n            raise ValueError(f\"变量 '{var_name}' 在文件中不存在。可用变量: {list(ds.variables)}\")\n        data_array = ds[var_name]",
+        "detail": "get_same_size",
+        "documentation": {}
+    },
+    {
+        "label": "process_file",
+        "kind": 2,
+        "importPath": "get_same_size",
+        "description": "get_same_size",
+        "peekOfCode": "def process_file(input_path, output_dir, base_info, key, var_names):\n    \"\"\"\n    处理单个栅格文件，包括重采样和数据类型转换，并保留输出文件格式。\n    \"\"\"\n    # 检查输入文件是否存在\n    if not os.path.exists(input_path):\n        print(f\"警告: 文件不存在 {input_path}\")\n        return\n    # 从基准信息中解包参数\n    base_transform, base_crs, base_height, base_width = base_info",
+        "detail": "get_same_size",
+        "documentation": {}
+    },
+    {
+        "label": "main",
+        "kind": 2,
+        "importPath": "get_same_size",
+        "description": "get_same_size",
+        "peekOfCode": "def main():\n    \"\"\"主函数，负责执行数据处理流程。\"\"\"\n    lst_path = None\n    # 遍历MODIS文件夹，找到第一个 .nc 文件作为基准栅格\n    for root, _, files in os.walk(data_paths['modis']):\n        for file in files:\n            if file.endswith('.nc'):\n                lst_path = os.path.join(root, file)\n                break\n        if lst_path:",
+        "detail": "get_same_size",
+        "documentation": {}
+    },
+    {
+        "label": "data_paths",
+        "kind": 5,
+        "importPath": "get_same_size",
+        "description": "get_same_size",
+        "peekOfCode": "data_paths = {\n        'dem': 'I:\\\\SRTM_DEM\\\\2018_1000\\\\SRTM_DEM_resample_clip.img',\n        'slope': 'I:\\\\SRTM_DEM\\\\2018_1000\\\\SRTM_DEM_resample_clip_slope.img', \n        'aspect': 'I:\\\\SRTM_DEM\\\\2018_1000\\\\SRTM_DEM_resample_clip_aspect.img',\n        'clcd': 'I:\\\\CLCD\\\\2018_1000m\\\\CLCD_v01_2018__ProjectRaster_clip1.tif',\n        'era5': 'G:\\\\CNN_SpatialDownscaling\\\\201712and201901\\\\ERA5_1000',\n        'smap': 'G:\\\\CNN_SpatialDownscaling\\\\201712and201901\\\\SMAP201712\\\\output_clip_re_1000_nc',\n        'modis': r'G:\\CNN_SpatialDownscaling\\MODIS11\\2018_clip',\n        'ndvi': 'G:\\\\CNN_SpatialDownscaling\\\\201712and201901\\\\ndvi\\\\2019'\n}",
+        "detail": "get_same_size",
+        "documentation": {}
+    },
+    {
+        "label": "var_names",
+        "kind": 5,
+        "importPath": "get_same_size",
+        "description": "get_same_size",
+        "peekOfCode": "var_names = {\n    'era5': ['t2m', 'ssrd', 'strd', 'vpd', 'd2m', 'rh'],\n    'smap': 'sm_surface_wetness',\n    'cldas': 'TG',\n    'ndvi': '_1_km_16_days_NDVI',\n    'modis': 'LST_1km'  # LST 变量名未使用，因为LST文件夹中只有LST数据\n}\ndef get_base_raster_info(data_path, var_name):\n    \"\"\"\n    从指定的 NetCDF 文件中获取基准栅格信息，若缺失则手动设置。",
+        "detail": "get_same_size",
+        "documentation": {}
+    },
+    {
+        "label": "merge_nc_folders",
+        "kind": 2,
+        "importPath": "merge_same_ncfiles",
+        "description": "merge_same_ncfiles",
+        "peekOfCode": "def merge_nc_folders(folder1, folder2, output_folder):\n    \"\"\"\n    合并两个文件夹中同名的nc文件，若同一网格位置两个文件都有值则取平均值。\n    参数:\n        folder1 (str): 第一个输入文件夹路径\n        folder2 (str): 第二个输入文件夹路径\n        output_folder (str): 输出文件夹路径\n    \"\"\"\n    # 创建输出目录\n    os.makedirs(output_folder, exist_ok=True)",
+        "detail": "merge_same_ncfiles",
+        "documentation": {}
+    },
+    {
+        "label": "separate_modis_by_time",
+        "kind": 2,
+        "importPath": "ModisandNDVI_TimeSplit_clip",
+        "description": "ModisandNDVI_TimeSplit_clip",
+        "peekOfCode": "def separate_modis_by_time(input_file, clip_data, output_folder,first_name):\n    with nc.Dataset(input_file) as f:\n        # time是f文件中的某个变量variables\n        #f['Day_view_time'].set_collective(True)  #这是MOD11A1的变量\n        f['time'].set_collective(True)\n        ds = xr.open_dataset(\n            input_file,\n            decode_cf=True,\n            engine=\"netcdf4\"  # 强制使用netcdf4引擎，兼容性更好\n            )                      ",
+        "detail": "ModisandNDVI_TimeSplit_clip",
+        "documentation": {}
+    },
+    {
+        "label": "batch_process_modis_data",
+        "kind": 2,
+        "importPath": "modis_separate_by_view_time",
+        "description": "modis_separate_by_view_time",
+        "peekOfCode": "def batch_process_modis_data(input_dir, output_dir):\n    \"\"\"\n    批量处理MODIS数据\n    Parameters:\n    input_dir: str, 包含NC文件的输入目录路径\n    output_dir: str, 输出目录路径\n    \"\"\"\n    os.makedirs(output_dir, exist_ok=True)\n    nc_files = glob.glob(os.path.join(input_dir, \"*.nc\"))\n    if not nc_files:",
+        "detail": "modis_separate_by_view_time",
+        "documentation": {}
+    },
+    {
+        "label": "process_modis_hourly_data",
+        "kind": 2,
+        "importPath": "modis_separate_by_view_time",
+        "description": "modis_separate_by_view_time",
+        "peekOfCode": "def process_modis_hourly_data(input_file, output_dir):\n    \"\"\"\n    处理MODIS数据，按小时分离、质量筛选并统一变量名。\n    Parameters:\n    input_file: str, 输入的NC文件路径\n    output_dir: str, 输出目录路径\n    \"\"\"\n    os.makedirs(output_dir, exist_ok=True)\n    print(f\"正在读取文件: {input_file}\")\n    try:",
+        "detail": "modis_separate_by_view_time",
+        "documentation": {}
+    },
+    {
+        "label": "process_modis_hourly_data",
+        "kind": 2,
+        "importPath": "modis_separate_by_view_time_parallelVersion",
+        "description": "modis_separate_by_view_time_parallelVersion",
+        "peekOfCode": "def process_modis_hourly_data(input_file, output_dir):\n    \"\"\"\n    处理MODIS数据，按小时分离、质量筛选并统一变量名。\n    此版本在子进程内部直接将数据写入文件。\n    返回创建的文件数量，以及一个布尔值指示是否处理成功。\n    \"\"\"\n    os.makedirs(output_dir, exist_ok=True) \n    print(f\"[{os.getpid()}] 正在读取文件: {os.path.basename(input_file)}\")\n    try:\n        ds = xr.open_dataset(input_file)",
+        "detail": "modis_separate_by_view_time_parallelVersion",
+        "documentation": {}
+    },
+    {
+        "label": "batch_process_modis_data",
+        "kind": 2,
+        "importPath": "modis_separate_by_view_time_parallelVersion",
+        "description": "modis_separate_by_view_time_parallelVersion",
+        "peekOfCode": "def batch_process_modis_data(input_dir, output_dir):\n    \"\"\"\n    批量处理MODIS数据（并行版本，逐文件写入）。\n    每个子进程独立处理一个输入文件并写入其所有输出文件。\n    \"\"\"\n    os.makedirs(output_dir, exist_ok=True) \n    nc_files = glob.glob(os.path.join(input_dir, \"*.nc\"))\n    if not nc_files:\n        print(f\"在目录 {input_dir} 中未找到NC文件\")\n        return",
+        "detail": "modis_separate_by_view_time_parallelVersion",
+        "documentation": {}
+    },
+    {
+        "label": "extract_time_from_smap",
+        "kind": 2,
+        "importPath": "SMAP_clip2nc",
+        "description": "SMAP_clip2nc",
+        "peekOfCode": "def extract_time_from_smap(h5_file_path):\n    \"\"\"\n    从SMAP H5文件中提取时间信息并格式化为文件名用的时间字符串\n    \"\"\"\n    try:\n        with h5py.File(h5_file_path, 'r') as f:\n            if 'time' in f.keys():\n                time_data = f['time'][:]\n                time_attrs = dict(f['time'].attrs)               \n                units = time_attrs.get('units', 'seconds since 2000-01-01 00:00:00')",
+        "detail": "SMAP_clip2nc",
+        "documentation": {}
+    },
+    {
+        "label": "process_smap_data",
+        "kind": 2,
+        "importPath": "SMAP_clip2nc",
+        "description": "SMAP_clip2nc",
+        "peekOfCode": "def process_smap_data(h5_file_path, clip_gdf_preloaded, original_shapefile_path, output_nc_path=None):\n    \"\"\"\n    处理SMAP H5数据，按预加载的shapefile裁剪并转换为NetCDF格式。\n    确保输出文件的坐标系为WGS84。\n    此函数将在单独的进程中运行。\n    \"\"\"\n    logger.info(f\"开始处理文件: {os.path.basename(h5_file_path)}\")\n    if output_nc_path is None:\n        time_str = extract_time_from_smap(h5_file_path)\n        base_name = os.path.splitext(os.path.basename(h5_file_path))[0]",
+        "detail": "SMAP_clip2nc",
+        "documentation": {}
+    },
+    {
+        "label": "batch_process_smap",
+        "kind": 2,
+        "importPath": "SMAP_clip2nc",
+        "description": "SMAP_clip2nc",
+        "peekOfCode": "def batch_process_smap(input_dir, shapefile_path, output_dir, num_processes=None):\n    \"\"\"\n    批量处理多个SMAP H5文件，支持并行处理。    \n    Parameters:\n    -----------\n    input_dir : str\n        包含H5文件的输入目录\n    shapefile_path : str\n        用于裁剪的shapefile路径\n    output_dir : str",
+        "detail": "SMAP_clip2nc",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "SMAP_clip2nc",
+        "description": "SMAP_clip2nc",
+        "peekOfCode": "logger = logging.getLogger(__name__)\ndef extract_time_from_smap(h5_file_path):\n    \"\"\"\n    从SMAP H5文件中提取时间信息并格式化为文件名用的时间字符串\n    \"\"\"\n    try:\n        with h5py.File(h5_file_path, 'r') as f:\n            if 'time' in f.keys():\n                time_data = f['time'][:]\n                time_attrs = dict(f['time'].attrs)               ",
+        "detail": "SMAP_clip2nc",
+        "documentation": {}
+    },
+    {
+        "label": "calculate_grid_spacing",
+        "kind": 2,
+        "importPath": "SMAP_resample1000",
+        "description": "SMAP_resample1000",
+        "peekOfCode": "def calculate_grid_spacing(x_coords, y_coords, cell_lat, cell_lon):\n    \"\"\"\n    计算原始网格的实际物理间距（米）\n    Parameters:\n    -----------\n    x_coords, y_coords : array\n        原始x,y坐标\n    cell_lat, cell_lon : 2D arrays\n        实际的纬度经度坐标\n    Returns:",
+        "detail": "SMAP_resample1000",
+        "documentation": {}
+    },
+    {
+        "label": "create_resampled_grid",
+        "kind": 2,
+        "importPath": "SMAP_resample1000",
+        "description": "SMAP_resample1000",
+        "peekOfCode": "def create_resampled_grid(original_x, original_y, original_spacing_x_m, original_spacing_y_m, target_spacing_m):\n    \"\"\"\n    创建重采样后的网格坐标\n    Parameters:\n    -----------\n    original_x, original_y : arrays\n        原始x,y坐标\n    original_spacing_x_m, original_spacing_y_m : float\n        原始网格的x,y方向间距（米）\n    target_spacing_m : float",
+        "detail": "SMAP_resample1000",
+        "documentation": {}
+    },
+    {
+        "label": "resample_using_zoom",
+        "kind": 2,
+        "importPath": "SMAP_resample1000",
+        "description": "SMAP_resample1000",
+        "peekOfCode": "def resample_using_zoom(data_array, x_ratio, y_ratio, order=1):\n    \"\"\"\n    使用scipy.ndimage.zoom进行快速重采样\n    Parameters:\n    -----------\n    data_array : 3D array (time, y, x)\n        输入数据\n    x_ratio, y_ratio : float\n        重采样比例\n    order : int",
+        "detail": "SMAP_resample1000",
+        "documentation": {}
+    },
+    {
+        "label": "resample_coordinates",
+        "kind": 2,
+        "importPath": "SMAP_resample1000",
+        "description": "SMAP_resample1000",
+        "peekOfCode": "def resample_coordinates(cell_lat, cell_lon, x_ratio, y_ratio, order=1):\n    \"\"\"\n    重采样坐标数组\n    Parameters:\n    -----------\n    cell_lat, cell_lon : 2D arrays\n        原始坐标\n    x_ratio, y_ratio : float\n        重采样比例\n    order : int",
+        "detail": "SMAP_resample1000",
+        "documentation": {}
+    },
+    {
+        "label": "resample_smap_data",
+        "kind": 2,
+        "importPath": "SMAP_resample1000",
+        "description": "SMAP_resample1000",
+        "peekOfCode": "def resample_smap_data(input_nc_path, output_nc_path, target_spacing_m=1000, method='linear'):\n    \"\"\"\n    重采样单个SMAP NetCDF文件到指定网格间距\n    Parameters:\n    -----------\n    input_nc_path : str\n        输入NetCDF文件路径\n    output_nc_path : str\n        输出NetCDF文件路径\n    target_spacing_m : int",
+        "detail": "SMAP_resample1000",
+        "documentation": {}
+    },
+    {
+        "label": "batch_resample_smap",
+        "kind": 2,
+        "importPath": "SMAP_resample1000",
+        "description": "SMAP_resample1000",
+        "peekOfCode": "def batch_resample_smap(input_dir, output_dir, target_spacing_m=1000, \n                       method='linear', num_processes=None, file_pattern=\"*_clipped_*.nc\"):\n    \"\"\"\n    批量重采样SMAP NetCDF文件\n    Parameters:\n    -----------\n    input_dir : str\n        输入目录路径\n    output_dir : str\n        输出目录路径",
+        "detail": "SMAP_resample1000",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "SMAP_resample1000",
+        "description": "SMAP_resample1000",
+        "peekOfCode": "logger = logging.getLogger(__name__)\ndef calculate_grid_spacing(x_coords, y_coords, cell_lat, cell_lon):\n    \"\"\"\n    计算原始网格的实际物理间距（米）\n    Parameters:\n    -----------\n    x_coords, y_coords : array\n        原始x,y坐标\n    cell_lat, cell_lon : 2D arrays\n        实际的纬度经度坐标",
+        "detail": "SMAP_resample1000",
+        "documentation": {}
+    },
+    {
+        "label": "resample_to_target_resolution_wgs84_improved",
+        "kind": 2,
+        "importPath": "SMAP_resample1000_clip2nc",
+        "description": "SMAP_resample1000_clip2nc",
+        "peekOfCode": "def resample_to_target_resolution_wgs84_improved(sm_data, cell_lat, cell_lon, target_resolution_deg=0.00833333333, method='linear'):\n    \"\"\"\n    改进的重采样函数：既保持插值效果，又避免在无效区域产生数据\n    策略：\n    1. 正常进行插值以保持数据连续性\n    2. 使用原始数据的有效区域掩膜来限制插值结果的范围\n    3. 适度扩展有效区域以允许合理的插值\n    \"\"\"\n    logger.info(f\"开始改进重采样，原始数据形状: {sm_data.shape}\")\n    # 获取有效坐标掩膜",
+        "detail": "SMAP_resample1000_clip2nc",
+        "documentation": {}
+    },
+    {
+        "label": "resample_with_adaptive_masking",
+        "kind": 2,
+        "importPath": "SMAP_resample1000_clip2nc",
+        "description": "SMAP_resample1000_clip2nc",
+        "peekOfCode": "def resample_with_adaptive_masking(sm_data, cell_lat, cell_lon, target_resolution_deg=0.009, method='linear'):\n    \"\"\"\n    自适应掩膜方法：根据数据密度调整有效区域\n    \"\"\"\n    logger.info(f\"开始自适应掩膜重采样，原始数据形状: {sm_data.shape}\")\n    # 基本有效性检查\n    valid_coord_mask = np.logical_and(\n        np.logical_and(np.isfinite(cell_lat), np.isfinite(cell_lon)),\n        np.logical_and(cell_lat >= -90, cell_lat <= 90)\n    )",
+        "detail": "SMAP_resample1000_clip2nc",
+        "documentation": {}
+    },
+    {
+        "label": "extract_time_from_smap",
+        "kind": 2,
+        "importPath": "SMAP_resample1000_clip2nc",
+        "description": "SMAP_resample1000_clip2nc",
+        "peekOfCode": "def extract_time_from_smap(h5_file_path):\n    \"\"\"\n    从SMAP H5文件中提取时间信息并格式化为文件名用的时间字符串\n    \"\"\"\n    try:\n        with h5py.File(h5_file_path, 'r') as f:\n            if 'time' in f.keys():\n                time_data = f['time'][:]\n                time_attrs = dict(f['time'].attrs)               \n                units = time_attrs.get('units', 'seconds since 2000-01-01 00:00:00')",
+        "detail": "SMAP_resample1000_clip2nc",
+        "documentation": {}
+    },
+    {
+        "label": "process_smap_data",
+        "kind": 2,
+        "importPath": "SMAP_resample1000_clip2nc",
+        "description": "SMAP_resample1000_clip2nc",
+        "peekOfCode": "def process_smap_data(h5_file_path, clip_gdf_preloaded, original_shapefile_path, output_nc_path=None, target_resolution=1000):\n    \"\"\"\n    处理SMAP H5数据：先裁剪，再重采样到指定分辨率，最后转换为NetCDF格式（WGS84坐标系）\n    Parameters:\n    -----------\n    target_resolution : int\n        目标分辨率（米），默认1000m\n    \"\"\"\n    logger.info(f\"开始处理文件: {os.path.basename(h5_file_path)}\")\n    if output_nc_path is None:",
+        "detail": "SMAP_resample1000_clip2nc",
+        "documentation": {}
+    },
+    {
+        "label": "batch_process_smap",
+        "kind": 2,
+        "importPath": "SMAP_resample1000_clip2nc",
+        "description": "SMAP_resample1000_clip2nc",
+        "peekOfCode": "def batch_process_smap(input_dir, shapefile_path, output_dir, target_resolution=1000, num_processes=None):\n    \"\"\"\n    批量处理多个SMAP H5文件：先裁剪再重采样，支持并行处理\n    Parameters:\n    -----------\n    input_dir : str\n        包含H5文件的输入目录\n    shapefile_path : str\n        用于裁剪的shapefile路径\n    output_dir : str",
+        "detail": "SMAP_resample1000_clip2nc",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "SMAP_resample1000_clip2nc",
+        "description": "SMAP_resample1000_clip2nc",
+        "peekOfCode": "logger = logging.getLogger(__name__)\ndef resample_to_target_resolution_wgs84_improved(sm_data, cell_lat, cell_lon, target_resolution_deg=0.00833333333, method='linear'):\n    \"\"\"\n    改进的重采样函数：既保持插值效果，又避免在无效区域产生数据\n    策略：\n    1. 正常进行插值以保持数据连续性\n    2. 使用原始数据的有效区域掩膜来限制插值结果的范围\n    3. 适度扩展有效区域以允许合理的插值\n    \"\"\"\n    logger.info(f\"开始改进重采样，原始数据形状: {sm_data.shape}\")",
+        "detail": "SMAP_resample1000_clip2nc",
+        "documentation": {}
+    },
+    {
+        "label": "split_era5_zip",
+        "kind": 2,
+        "importPath": "split_era5_zip",
+        "description": "split_era5_zip",
+        "peekOfCode": "def split_era5_zip(zip_dir, out_dir):\n    \"\"\"\n    遍历zip_dir下所有zip文件，解压后按小时分割nc文件并输出到out_dir\n    输出文件名格式：ERA5_yyyy_mm_dd_hh.nc\n    \"\"\"\n    os.makedirs(out_dir, exist_ok=True)\n    print(os.listdir(zip_dir))  # 打印zip_dir目录下的文件列表\n    for fname in os.listdir(zip_dir):\n        if fname.lower().endswith('.zip'):\n            zip_path = os.path.join(zip_dir, fname)",
+        "detail": "split_era5_zip",
+        "documentation": {}
+    },
+    {
+        "label": "calculate_es_ea_rh_vpd",
+        "kind": 2,
+        "importPath": "split_era5_zip_and_caluateVPDandRH",
+        "description": "split_era5_zip_and_caluateVPDandRH",
+        "peekOfCode": "def calculate_es_ea_rh_vpd(t2m_kelvin, d2m_kelvin):\n    \"\"\"\n    计算饱和水汽压 (es), 实际水汽压 (ea), 相对湿度 (rh) 和 水汽压差 (vpd)。\n    t2m_kelvin: 2米温度 (开尔文)\n    d2m_kelvin: 2米露点温度 (开尔文)\n    \"\"\"\n    t2m_celsius = t2m_kelvin - 273.15\n    d2m_celsius = d2m_kelvin - 273.15\n    es = 0.61094 * np.exp((17.625 * t2m_celsius) / (t2m_celsius + 243.04))\n    ea = 0.61094 * np.exp((17.625 * d2m_celsius) / (d2m_celsius + 243.04))",
+        "detail": "split_era5_zip_and_caluateVPDandRH",
+        "documentation": {}
+    },
+    {
+        "label": "process_single_zip_file",
+        "kind": 2,
+        "importPath": "split_era5_zip_and_caluateVPDandRH",
+        "description": "split_era5_zip_and_caluateVPDandRH",
+        "peekOfCode": "def process_single_zip_file(zip_path, out_dir):\n    \"\"\"\n    处理单个ERA5 zip文件：解压、按小时分割NC文件、计算VPD和相对湿度。\n    这是一个独立的函数，适合并行处理。\n    \"\"\"\n    logging.info(f\"开始处理ZIP文件: {zip_path}\")\n    with zipfile.ZipFile(zip_path, 'r') as z:\n        nc_names = [n for n in z.namelist() if n.lower().endswith('.nc')]\n        if not nc_names:\n            logging.warning(f\"{zip_path} 未找到nc文件，跳过。\")",
+        "detail": "split_era5_zip_and_caluateVPDandRH",
+        "documentation": {}
+    },
+    {
+        "label": "split_era5_zip_parallel",
+        "kind": 2,
+        "importPath": "split_era5_zip_and_caluateVPDandRH",
+        "description": "split_era5_zip_and_caluateVPDandRH",
+        "peekOfCode": "def split_era5_zip_parallel(zip_dir, out_dir, max_workers=None):\n    \"\"\"\n    遍历zip_dir下所有zip文件，解压后按小时分割nc文件，计算VPD和相对湿度，\n    并输出到out_dir，采用并行处理。\n    \"\"\"\n    os.makedirs(out_dir, exist_ok=True)\n    logging.info(f\"正在处理目录: {zip_dir}\")\n    logging.info(f\"输出目录: {out_dir}\")\n    zip_files = [os.path.join(zip_dir, f) for f in os.listdir(zip_dir) if f.lower().endswith('.zip')]\n    if not zip_files:",
+        "detail": "split_era5_zip_and_caluateVPDandRH",
+        "documentation": {}
+    },
+    {
+        "label": "extract_and_merge_img",
+        "kind": 2,
+        "importPath": "SRTM_DEM_merge",
+        "description": "SRTM_DEM_merge",
+        "peekOfCode": "def extract_and_merge_img(zip_dir, output_img_path, output_nc_path):\n    \"\"\"\n    提取zip文件中的.img文件并合并，输出为一个.img文件和一个.nc文件\n    :param zip_dir: 包含zip文件的目录\n    :param output_img_path: 合并后的.img文件输出路径\n    :param output_nc_path: 合并后的.nc文件输出路径\n    \"\"\"\n    img_files = []\n    # 遍历目录下所有zip文件\n    for fname in os.listdir(zip_dir):",
+        "detail": "SRTM_DEM_merge",
+        "documentation": {}
+    },
+    {
+        "label": "file",
+        "kind": 5,
+        "importPath": "test",
+        "description": "test",
+        "peekOfCode": "file = r\"G:\\CNN_SpatialDownscaling\\MODIS11\\2018_mod11\\output_hourly_data\\MOD11_20171217_21.nc \"\nds = xr.open_dataset(file)\narr = ds[\"LST_1km\"].values\nprint(\"min:\", np.nanmin(arr))\nprint(\"max:\", np.nanmax(arr))\nprint(\"NaN比例:\", np.isnan(arr).sum() / arr.size * 100)",
+        "detail": "test",
+        "documentation": {}
+    },
+    {
+        "label": "ds",
+        "kind": 5,
+        "importPath": "test",
+        "description": "test",
+        "peekOfCode": "ds = xr.open_dataset(file)\narr = ds[\"LST_1km\"].values\nprint(\"min:\", np.nanmin(arr))\nprint(\"max:\", np.nanmax(arr))\nprint(\"NaN比例:\", np.isnan(arr).sum() / arr.size * 100)",
+        "detail": "test",
+        "documentation": {}
+    },
+    {
+        "label": "arr",
+        "kind": 5,
+        "importPath": "test",
+        "description": "test",
+        "peekOfCode": "arr = ds[\"LST_1km\"].values\nprint(\"min:\", np.nanmin(arr))\nprint(\"max:\", np.nanmax(arr))\nprint(\"NaN比例:\", np.isnan(arr).sum() / arr.size * 100)",
+        "detail": "test",
+        "documentation": {}
+    }
+]

@@ -1,0 +1,149 @@
+基于您提供的代码框架（DataLoader 类，用于加载全局和局部时空数据，支持预训练和微调模式），我重新梳理了课题的研究思路。该课题聚焦于基于 Transformer 架构的 MODIS LST（陆地表面温度）时空插补，旨在解决 MODIS 数据稀疏性（42% 覆盖率）和大体量问题（1TB 局部数据），生成 2018 年每小时高分辨率 LST 栅格（8760 个 NetCDF 文件）。思路强调数据驱动、迁移学习和内存优化，分为四个阶段：数据准备、预训练模型构建、每日 fine-tune 和时空插补应用。优化目标包括计算效率（训练时间 97 小时，节省 87%）、存储（4.2 GB，总节省 50%）和内存使用（动态分配数组，跳过缺失时间点）。
+
+总体目标
+
+* **输入**：30 天小时级序列（720 小时），17 个特征（7 连续：DEM、Slope、sin_aspect、cos_aspect、NDVI、T2m、SSRD、STRD、RH、D2M、VPD；2 分类：SMAP、CLCD（原值，不标准化）；4 时间：month、day、hour、doy；4 地理：lat_sin、lat_cos、lon_sin、lon_cos）。
+
+* **输出**：1km LST 插补栅格（NetCDF，包含 lst、lst_global_upsampled、mask）。
+
+* **数据范围**：2017-12、2018 全年、2019-01（全局 20GB+3.2GB，局部 1TB+160GB），统一 WGS84 坐标和分辨率。
+
+* **模型**：Transformer（d_model=512，8 头，4-6 层，dropout 0.1-0.3），输入维度 16（展平后）。
+
+* **NoData 处理**：统一值（cldas: 0，modis: -9999，era5/vpd: -9999，dem: -32768 等），严格清除含 NoData 样本（覆盖率 > 50%）。
+
+* **优化**：动态加载、跳过缺失时间点（CLDAS/MODIS 缺失时不加载其他数据）、缓存（HDF5）、分批加载（batch_size=100）。
+
+1. 数据准备阶段
+
+目标：加载、清洗、预处理 2017-12、2018 全年及 2019-01 数据（全局 ≈20GB+3.2GB，局部 ≈1TB+160GB），生成 Pandas DataFrame（展平像素，形状 (n_pixels, 16)），应对 MODIS 稀疏性和大体量。
+
+* **数据加载**：
+
+   * **全局数据** (global_data_paths)：
+
+      * 路径：DEM/Slope/Aspect/CLCD (rasterio/gdal)，ERA5 (t2m/ssrd/strd/rh/d2m/vpd, xarray)，SMAP (sm_surface_wetness)，CLDAS (TG)，NDVI (_1_km_16_days_NDVI)。
+
+      * 文件名格式：CLDAS_YYYYMMDD_HH.nc，ERA5_YYYY_MM_DD_HH.nc，SMAP_...TYYYYMMDDTHHMMSS.nc，NDVI_YYYY-MM-DD_HHMMSS_*.nc。
+
+      * 加载：预训练整月（744 小时），微调 ±15 天（720 小时）。
+
+   * **局部数据** (local_data_paths)：
+
+      * 路径：DEM_1km/Slope_1km/Aspect_1km/CLCD_1km (rasterio/gdal)，ERA5_1km (t2m/ssrd/strd/rh/d2m/vpd, xarray)，SMAP_1km (sm_surface_wetness)，MODIS_1km (LST_1km)，NDVI_1km (_1_km_16_days_NDVI)。
+
+      * 文件名格式：MOD11_YYYYMMDD_HH.nc，ERA5_1km_YYYY_MM_DD_HH.nc，SMAP_1km_...TYYYYMMDDTHHMMSS.nc，NDVI_1km_YYYY-MM-DD_HHMMSS_*.nc。
+
+      * 加载：微调 ±15 天（720 小时），分 4×4 子区域（960×900）。
+
+   * **时间窗口**：预训练整月，微调 ±15 天（2017-12 补年初，2019-01 补年末）。
+
+   * **大体量应对**：缓存 (HDF5)，分批加载 (batch_size=100)，跳过缺失时间点。
+
+* **NoData 处理**：
+
+   * 检查每个像素：若任一特征（7 连续 + SMAP/CLCD）或 LST 含 NoData，删除该像素。
+
+   * MODIS 挑战：42% 覆盖，优先高覆盖小时 (>50%)，缺失时用全局预测补全。
+
+   * SMAP/CLCD：0 视为有效类别。
+
+* **特征工程**：
+
+   * **连续特征**：DEM (Z-score)，Slope ([0,1] 归一化)，Aspect (sin/cos)，NDVI ([-1,1] 原值)，T2m/SSRD/STRD/RH/D2M/VPD (Z-score)。
+
+   * **分类特征**：SMAP (0-4，原值)，CLCD (0-9，原值)。
+
+   * **时间/地理**：month/day/hour/doy (整数)，lat/lon (直接使用，无 sin/cos 转换)。
+
+   * **输入**：Pandas DataFrame，展平像素 (n_pixels, 16)（7 连续 + 2 分类 + 4 时间 + 3 地理）。
+
+* **数据集划分**：
+
+   * 预训练：80% 训练，10% 验证，10% 测试（仅有效样本）。
+
+   * 微调：前 24 天训练，25-27 天验证，28-30 天测试。
+
+2. 预训练模型构建阶段
+
+目标：训练 12 个全局预训练 Transformer 模型（每月），优化超参数，捕捉季节性模式，为每日 fine-tune 提供初始化权重。
+
+* **架构**：
+
+   * Transformer (4-6 层，8 头，d_model=512，dropout 0.1-0.3)。
+
+   * 输入：(batch, n_pixels, 16)，展平空间。
+
+   * 输出：LST 预测 (batch, n_pixels, 1)。
+
+* **训练**：
+
+   * 数据：每月 CLDAS LST + 16 特征，清除 NoData。
+
+   * 损失：MSE (预测 LST vs CLDAS LST)。
+
+   * 优化：Adam，超参数搜索 (lr: 1e-3/1e-4/1e-5, batch: 16/32/64, dropout: 0.1/0.2/0.3, 层: 4/5/6)。
+
+   * 选择：最低验证 MSE (如 2018-01: 4 层, lr 1e-4, batch 32)。
+
+* **输出**：12 个模型权重 (global_pretrain_01.pt ~ 12.pt, 0.12-0.6 GB)。
+
+* **超参数管理**：
+
+   * 保存 JSON (hyperparams_01.json)，用于当月 fine-tune。
+
+3. 每日 fine-tune 阶段
+
+目标：每日 fine-tune 全局模型，从全局初始化局部模型，生成 730 个模型 (365 全局 + 365 局部)，使用当月超参数，插补当天 LST 缺失点。
+
+* **全局 fine-tune**：
+
+   * 加载当月全局权重 (global_pretrain_01.pt)。
+
+   * 输入：±15 天 CLDAS 数据 (720 小时) + 16 特征，清除 NoData。
+
+   * 冻结前 2-3 层，微调后层。
+
+   * 超参数：lr 1e-5, 1-5 epoch, batch 16。
+
+   * 损失：MSE (预测 LST vs CLDAS LST)。
+
+   * 输出：每日增量权重 (global_finetune_20180115.pt, 1-5 MB, 365×5MB ≈ 1.8 GB)。
+
+* **局部 fine-tune**：
+
+   * 从全局 fine-tune 权重初始化 (调整维度适应 1km 网格)。
+
+   * 输入：±15 天 MODIS 数据 (720 小时) + 16 特征 + 上采样全局预测，清除 NoData。
+
+   * 冻结前 2-3 层，微调后层。
+
+   * 损失：MSE (预测 LST vs MODIS LST) + 0.1×KL (局部 vs 全局上采样)。
+
+   * MODIS 挑战：42% 覆盖，缺失时用全局预测补全，分 4×4 子区域。
+
+   * 输出：每日增量权重 (local_finetune_20180115.pt, 1.8 GB)。
+
+4. 时空插补应用阶段
+
+目标：应用 730 个 fine-tune 模型，插补 2018 年 365 天 每小时1km LST 缺失点，生成 NetCDF 输出。即2018年365天应该输出8760个 NetCDF文件，我最终需要获得每小时1km无缺损的LST数据集。
+
+* **插补流程 (e.g., 2018-01-15)**：
+
+   * **全局预测**：加载 global_finetune_20180115.pt，输入 ±15 天数据，输出 0.0625° LST (256×240)。
+
+   * **上采样**：线性插值到 1km (1920×1800)。
+
+   * **局部插补**：加载 local_finetune_20180115.pt，输入 ±15 天数据 + 上采样全局，输出 1km LST，插补缺失点。
+
+   * **输出**：NetCDF (lst_interpolated_20180115.nc, lst、lst_global_upsampled、mask, zlib 压缩, 10-20 GB/年)。
+
+* **评估**：
+
+   * 指标：R²、RMSE、MAE、SpatialCorr (基于 MODIS 已知点)；MODIS 不足时用上采样 CLDAS 或 NDVI 验证。
+
+   * 可视化：预测 LST vs 真实 LST (PNG)。
+
+中文回答
+
+这些文件经过调试已经成功，现在请你根据研究思路生成训练模型，全局预训练模型，全局微调模型和局部微调模型，所有输入数据均使用实际数据，每个文件都要求可以单独进行调试，中文注释详细，config.json是文件路径模型参数等配置文件，data_loader.py是数据加载文件，preprocess.py是对数据进行标准化转化为张量的代码，model.py是模型的代码，train_global.py是全局预训练模型的代码

@@ -1,0 +1,476 @@
+import os
+import json
+import numpy as np
+import xarray as xr
+import rasterio
+import logging
+from datetime import datetime, timedelta
+import re
+import h5py
+import netCDF4
+
+# 配置日志
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# 禁用 HDF5 文件锁定
+os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
+
+class DataLoader:
+    def __init__(self, config_path):
+        """初始化数据加载器，加载配置文件
+        
+        Args:
+            config_path (str): 配置文件路径
+        """
+        if not os.path.exists(config_path):
+            raise FileNotFoundError(f"配置文件 {config_path} 不存在，请检查路径或创建文件")
+        with open(config_path, 'r') as f:
+            self.config = json.load(f)
+        self.global_paths = self.config['global_data_paths']
+        self.local_paths = self.config['local_data_paths']
+        self.var_names = self.config['var_names']
+        self.nodata_values = self.config['nodata_values']
+        self.time_window = self.config['data_params']['time_window']
+        self.global_shape = tuple(self.config['data_params']['global_shape'])
+        self.local_shape = tuple(self.config['data_params']['local_shape'])
+        self.subregion_split = self.config['data_params']['subregion_split']
+        self.lon_range = self.config['data_params']['lon_range']
+        self.lat_range = self.config['data_params']['lat_range']
+        self.cache_dir = self.config.get('cache_dir', 'G:\\cache')
+        os.makedirs(self.cache_dir, exist_ok=True)
+        logger.info(f"数据加载器初始化完成，加载变量: {self.var_names}, 经纬度范围: lon={self.lon_range}, lat={self.lat_range}")
+
+    def parse_time_from_filename(self, filename, data_type):
+        """从文件名解析时间
+        
+        Args:
+            filename (str): 文件名
+            data_type (str): 数据类型（cldas, smap, era5, modis, ndvi）
+        
+        Returns:
+            datetime: 解析出的时间，或 None
+        """
+        filename = os.path.basename(filename)
+        try:
+            if data_type == 'cldas':
+                m = re.match(r'CLDAS_(\d{8})_(\d{2})\.nc', filename)
+                if m:
+                    return datetime.strptime(m.group(1) + m.group(2), '%Y%m%d%H')
+            elif data_type in ['smap', 'smap_1km']:
+                parts = filename.split('_')
+                for part in parts:
+                    if 'T' in part and len(part) == 15:
+                        return datetime.strptime(part, '%Y%m%dT%H%M%S')
+            elif data_type in ['era5', 'era5_1km']:
+                parts = filename.split('_')
+                if len(parts) >= 5:
+                    time_parts = parts[1:5]
+                    time_str = '_'.join(time_parts)
+                    return datetime.strptime(time_str, '%Y_%m_%d_%H')
+            elif data_type == 'modis':
+                m = re.match(r'MOD11_(\d{8})_(\d{2})\.nc', filename)
+                if m:
+                    return datetime.strptime(m.group(1) + m.group(2), '%Y%m%d%H')
+            elif data_type in ['ndvi', 'ndvi_1km']:
+                
+                m = filename.split('_')[1] + '_' + filename.split('_')[2]
+                
+                if m:
+                    return datetime.strptime(m, '%Y-%m-%d_%H%M%S')
+        except Exception as e:
+            logger.warning(f"解析文件名 {filename} 失败，类型: {data_type}, 错误: {str(e)}")
+        return None
+
+    def get_file_list(self, path, start_date, end_date, data_type):
+        """获取指定时间范围内的文件列表
+        
+        Args:
+            path (str): 数据目录路径
+            start_date (datetime): 开始日期
+            end_date (datetime): 结束日期
+            data_type (str): 数据类型（cldas, smap, era5, modis, ndvi）
+        
+        Returns:
+            list: 文件路径和时间列表 [(path, time), ...]
+        """
+        if not os.path.exists(path):
+            logger.warning(f"数据目录 {path} 不存在，返回空文件列表")
+            return []
+        files = []
+        for filename in os.listdir(path):
+            if not filename.endswith(('.nc', '.tif', '.img')):
+                continue
+            file_time = self.parse_time_from_filename(filename, data_type)
+            if file_time:
+                window = timedelta(days=16) if data_type in ['ndvi', 'ndvi_1km'] else timedelta(hours=3) if data_type in ['smap', 'smap_1km'] else timedelta(minutes=30)
+                if (file_time <= end_date and file_time + window >= start_date):
+                    files.append((os.path.join(path, filename), file_time))
+        files = sorted(files, key=lambda x: x[1])
+        logger.info(f"获取 {len(files)} 个文件，路径: {path}, 时间范围: {start_date} 至 {end_date}")
+        return files
+
+    def find_closest_file(self, files, target_time, max_delta, data_type='default'):
+        """查找时间最接近的文件，考虑窗口覆盖
+        
+        Args:
+            files (list): 文件路径和时间列表 [(path, time), ...]
+            target_time (datetime): 目标时间
+            max_delta (timedelta): 最大允许时间差
+            data_type (str): 数据类型
+        
+        Returns:
+            str: 文件路径，或 None
+        """
+        window_delta = {
+            'ndvi': timedelta(days=16),
+            'ndvi_1km': timedelta(days=16),
+            'smap': timedelta(hours=3),
+            'smap_1km': timedelta(hours=3),
+            'default': timedelta(minutes=30)
+        }
+        window = window_delta.get(data_type, window_delta['default'])
+        
+        closest_file = None
+        min_delta = max_delta
+        
+        for file_path, file_start_time in files:
+            file_end_time = file_start_time + window
+            if file_start_time <= target_time <= file_end_time:
+                logger.info(f"找到覆盖 {target_time} 的 {data_type} 文件: {file_path} (窗口: {file_start_time} 到 {file_end_time})")
+                return file_path
+            if target_time < file_start_time:
+                delta = file_start_time - target_time
+            else:
+                delta = target_time - file_end_time
+            if delta <= min_delta:
+                min_delta = delta
+                closest_file = file_path
+        
+        if closest_file:
+            logger.info(f"找到最近 {data_type} 文件: {closest_file} (距离: {min_delta})")
+        else:
+            logger.warning(f"未找到合适 {data_type} 文件 for {target_time} (max_delta: {max_delta})")
+        return closest_file
+
+    def load_dynamic_data(self, file_path, var_name, shape, nodata_value):
+        """加载动态数据（ERA5、SMAP、CLDAS、MODIS、NDVI）
+        
+        Args:
+            file_path (str): 文件路径
+            var_name (str): 变量名
+            shape (tuple): 预期形状
+            nodata_value: 无效值
+        
+        Returns:
+            ndarray: 数据数组，或全 NaN 数组
+        """
+        try:
+            # 检查变量是否存在
+            with netCDF4.Dataset(file_path, 'r') as ds:
+                available_vars = list(ds.variables)
+                selected_var = var_name
+                if var_name not in ds.variables:
+                    logger.warning(f"变量 {var_name} 不存在，尝试查找类似变量，文件: {file_path}")
+                    for v in available_vars:
+                        if var_name.lower() in v.lower():
+                            selected_var = v
+                            logger.info(f"使用变量 {selected_var} 替代 {var_name}")
+                            break
+                    else:
+                        logger.error(f"无匹配变量，文件: {file_path}, 可用变量: {available_vars}")
+                        return np.full(shape, np.nan)
+            # 加载数据
+            ds = xr.open_dataset(file_path, decode_times=False)
+            data = ds[selected_var].values
+            if data.ndim == 3 and data.shape[0] == 1:
+                data = data[0]
+                logger.info(f"已去除文件 {file_path} 的单一时间维度，调整后形状: {data.shape}")
+            if data.shape != shape:
+                logger.warning(f"动态数据形状 {data.shape} 与预期 {shape} 不符，文件: {file_path}")
+            return np.where(data == nodata_value, np.nan, data).astype(np.float32)
+        except Exception as e:
+            logger.error(f"加载动态数据失败: {file_path}, 变量: {var_name}, 错误: {str(e)}")
+            return np.full(shape, np.nan)
+
+    def load_global_data(self, target_date, is_pretrain=False):
+        """加载全局数据（19 个特征）
+        
+        Args:
+            target_date (datetime): 目标日期
+            is_pretrain (bool): 是否为预训练（加载整月数据）
+        
+        Returns:
+            tuple: (特征张量, 时间列表)
+        """
+        cache_file = f"{self.cache_dir}/{target_date.strftime('%Y%m')}_global.h5"
+        if os.path.exists(cache_file) and not is_pretrain:
+            try:
+                with h5py.File(cache_file, 'r') as f:
+                    data = f['data'][:]
+                    times = [datetime.fromisoformat(t.decode()) for t in f['times']]
+                    logger.info(f"从缓存加载全局数据: {cache_file}")
+                    return data, times
+            except Exception as e:
+                logger.warning(f"加载缓存失败: {cache_file}, 错误: {str(e)}, 将重新生成数据")
+                os.remove(cache_file)
+
+        if is_pretrain:
+            start_date = datetime(target_date.year, target_date.month, 1)
+            end_date = datetime(target_date.year, target_date.month + 1, 1) - timedelta(hours=1)
+        else:
+            start_date = target_date - timedelta(days=15)
+            end_date = target_date + timedelta(days=15)
+        if start_date.year < 2018:
+            start_date = max(start_date, datetime(2017, 12, 1))
+        if end_date.year > 2018:
+            end_date = min(end_date, datetime(2019, 1, 31, 23))
+
+        # 加载静态特征
+        for key in ['dem', 'slope', 'aspect', 'clcd']:
+            if not os.path.exists(self.global_paths[key]):
+                logger.error(f"静态文件 {self.global_paths[key]} 不存在")
+                raise FileNotFoundError(f"静态文件 {self.global_paths[key]} 不存在")
+
+        dem = rasterio.open(self.global_paths['dem']).read(1).astype(np.float32)
+        slope = rasterio.open(self.global_paths['slope']).read(1).astype(np.float32)
+        aspect = rasterio.open(self.global_paths['aspect']).read(1).astype(np.float32)
+        clcd = rasterio.open(self.global_paths['clcd']).read(1).astype(np.float32)
+
+        # 加载动态特征
+        cldas_files = self.get_file_list(self.global_paths['cldas'], start_date, end_date, 'cldas')
+        era5_files = self.get_file_list(self.global_paths['era5'], start_date, end_date, 'era5')
+        smap_files = self.get_file_list(self.global_paths['smap'], start_date, end_date, 'smap')
+        ndvi_files = self.get_file_list(self.global_paths['ndvi'], start_date, end_date, 'ndvi')
+
+        # 初始化张量
+        max_hours = self.time_window if not is_pretrain else ((end_date - start_date).days + 1) * 24
+        features = np.zeros((max_hours, *self.global_shape, 19), dtype=np.float32)
+        times = []
+        idx = 0
+        current = start_date
+        while current <= end_date and idx < max_hours:
+            cldas_file = self.find_closest_file(cldas_files, current, max_delta=timedelta(minutes=30), data_type='cldas')
+            era5_file = self.find_closest_file(era5_files, current, max_delta=timedelta(minutes=30), data_type='era5')
+            smap_file = self.find_closest_file(smap_files, current, max_delta=timedelta(hours=3), data_type='smap')
+            ndvi_file = self.find_closest_file(ndvi_files, current, max_delta=timedelta(days=16), data_type='ndvi')
+
+            if cldas_file and era5_file:
+                try:
+                    cldas_data = self.load_dynamic_data(cldas_file, self.var_names['cldas'], self.global_shape, self.nodata_values['cldas'])
+                    era5_data = [self.load_dynamic_data(era5_file, var, self.global_shape, self.nodata_values['era5']) for var in self.var_names['era5']]
+                    smap_data = self.load_dynamic_data(smap_file, self.var_names['smap'], self.global_shape, self.nodata_values['smap']) if smap_file else np.full(self.global_shape, np.nan)
+                    ndvi_data = self.load_dynamic_data(ndvi_file, self.var_names['ndvi'], self.global_shape, self.nodata_values['ndvi']) if ndvi_file else np.full(self.global_shape, np.nan)
+
+                    features[idx, :, :, 0] = np.where(dem == self.nodata_values['dem'], np.nan, dem)
+                    features[idx, :, :, 1] = np.where(slope == self.nodata_values['slope'], np.nan, slope)
+                    features[idx, :, :, 2] = np.where(aspect == self.nodata_values['aspect'], np.nan, aspect)
+                    features[idx, :, :, 3] = np.where(clcd == self.nodata_values['clcd'], np.nan, clcd)
+                    features[idx, :, :, 4] = ndvi_data
+                    features[idx, :, :, 5] = smap_data
+                    for i, var_data in enumerate(era5_data):
+                        features[idx, :, :, 6+i] = var_data
+                    features[idx, :, :, 12] = cldas_data
+                    times.append(current)
+                    idx += 1
+                except Exception as e:
+                    logger.warning(f"加载文件失败: {cldas_file}, {era5_file}, {smap_file}, {ndvi_file}, 错误: {str(e)}")
+
+            current += timedelta(hours=1)
+
+        # 添加时间和位置特征
+        if times:
+            time_features = self.generate_time_features(times, self.global_shape)
+            location_features = self.generate_location_features(self.global_shape, is_global=True)
+            features[:idx, :, :, 13:17] = time_features
+            features[:idx, :, :, 17:19] = np.broadcast_to(location_features, (idx, *self.global_shape, 2))
+        else:
+            logger.warning("无有效时间点，跳过时间和位置特征生成")
+
+        features = features[:idx]
+        if not is_pretrain:
+            try:
+                with h5py.File(cache_file, 'w') as f:
+                    f.create_dataset('data', data=features, compression='gzip')
+                    f.create_dataset('times', data=[t.isoformat().encode() for t in times])
+                logger.info(f"缓存全局数据: {cache_file}")
+            except Exception as e:
+                logger.error(f"保存缓存失败: {cache_file}, 错误: {str(e)}")
+
+        logger.info(f"加载全局数据完成，目标日期: {target_date}, 实际加载 {idx} 小时，变量: {self.var_names}")
+        return features, times
+
+    def load_local_data(self, target_date, is_pretrain=False):
+        """加载局部数据（19 个特征），按子区域加载
+        
+        Args:
+            target_date (datetime): 目标日期
+            is_pretrain (bool): 是否为预训练（加载整月数据）
+        
+        Returns:
+            list: [(子区域特征张量, 时间列表), ...]
+        """
+        cache_file = f"{self.cache_dir}/{target_date.strftime('%Y%m%d')}_local.h5"
+        if os.path.exists(cache_file) and not is_pretrain:
+            try:
+                with h5py.File(cache_file, 'r') as f:
+                    subregion_data = [(f[f'subregion_{i}/data'][:], [datetime.fromisoformat(t.decode()) for t in f[f'subregion_{i}/times']]) for i in range(len(self.subregion_split) ** 2)]
+                    logger.info(f"从缓存加载局部数据: {cache_file}")
+                    return subregion_data
+            except Exception as e:
+                logger.warning(f"加载缓存失败: {cache_file}, 错误: {str(e)}, 将重新生成数据")
+                os.remove(cache_file)
+
+        if is_pretrain:
+            start_date = datetime(target_date.year, target_date.month, 1)
+            end_date = datetime(target_date.year, target_date.month + 1, 1) - timedelta(hours=1)
+        else:
+            start_date = target_date - timedelta(days=15)
+            end_date = target_date + timedelta(days=15)
+        if start_date.year < 2018:
+            start_date = max(start_date, datetime(2017, 12, 1))
+        if end_date.year > 2018:
+            end_date = min(end_date, datetime(2019, 1, 31, 23))
+
+        # 加载静态特征
+        for key in ['dem_1km', 'slope_1km', 'aspect_1km', 'clcd_1km']:
+            if not os.path.exists(self.local_paths[key]):
+                logger.error(f"静态文件 {self.local_paths[key]} 不存在")
+                raise FileNotFoundError(f"静态文件 {self.local_paths[key]} 不存在")
+
+        dem = rasterio.open(self.local_paths['dem_1km']).read(1).astype(np.float32)
+        slope = rasterio.open(self.local_paths['slope_1km']).read(1).astype(np.float32)
+        aspect = rasterio.open(self.local_paths['aspect_1km']).read(1).astype(np.float32)
+        clcd = rasterio.open(self.local_paths['clcd_1km']).read(1).astype(np.float32)
+
+        # 加载动态特征
+        modis_files = self.get_file_list(self.local_paths['modis_1km'], start_date, end_date, 'modis')
+        era5_files = self.get_file_list(self.local_paths['era5_1km'], start_date, end_date, 'era5_1km')
+        smap_files = self.get_file_list(self.local_paths['smap_1km'], start_date, end_date, 'smap_1km')
+        ndvi_files = self.get_file_list(self.local_paths['ndvi_1km'], start_date, end_date, 'ndvi_1km')
+
+        # 分区域加载
+        subregion_data = []
+        sub_h, sub_w = self.local_shape[0] // self.subregion_split[0], self.local_shape[1] // self.subregion_split[1]
+        max_hours = self.time_window if not is_pretrain else ((end_date - start_date).days + 1) * 24
+        for i in range(self.subregion_split[0]):
+            for j in range(self.subregion_split[1]):
+                h_start, h_end = i * sub_h, (i + 1) * sub_h
+                w_start, w_end = j * sub_w, (j + 1) * sub_w
+                features = np.zeros((max_hours, sub_h, w_end - w_start, 19), dtype=np.float32)
+                times = []
+                idx = 0
+                current = start_date
+                while current <= end_date and idx < max_hours:
+                    modis_file = self.find_closest_file(modis_files, current, max_delta=timedelta(minutes=30), data_type='modis')
+                    era5_file = self.find_closest_file(era5_files, current, max_delta=timedelta(minutes=30), data_type='era5_1km')
+                    smap_file = self.find_closest_file(smap_files, current, max_delta=timedelta(hours=3), data_type='smap_1km')
+                    ndvi_file = self.find_closest_file(ndvi_files, current, max_delta=timedelta(days=16), data_type='ndvi_1km')
+
+                    if era5_file:
+                        try:
+                            modis_data = self.load_dynamic_data(modis_file, self.var_names['modis'], self.local_shape, self.nodata_values['modis'])[h_start:h_end, w_start:w_end] if modis_file else np.full((h_end - h_start, w_end - w_start), np.nan)
+                            era5_data = [self.load_dynamic_data(era5_file, var, self.local_shape, self.nodata_values['era5']) for var in self.var_names['era5']]
+                            smap_data = self.load_dynamic_data(smap_file, self.var_names['smap'], self.local_shape, self.nodata_values['smap'])[h_start:h_end, w_start:w_end] if smap_file else np.full((h_end - h_start, w_end - w_start), np.nan)
+                            ndvi_data = self.load_dynamic_data(ndvi_file, self.var_names['ndvi'], self.local_shape, self.nodata_values['ndvi'])[h_start:h_end, w_start:w_end] if ndvi_file else np.full((h_end - h_start, w_end - w_start), np.nan)
+
+                            features[idx, :, :, 0] = np.where(dem[h_start:h_end, w_start:w_end] == self.nodata_values['dem'], np.nan, dem[h_start:h_end, w_start:w_end])
+                            features[idx, :, :, 1] = np.where(slope[h_start:h_end, w_start:w_end] == self.nodata_values['slope'], np.nan, slope[h_start:h_end, w_start:w_end])
+                            features[idx, :, :, 2] = np.where(aspect[h_start:h_end, w_start:w_end] == self.nodata_values['aspect'], np.nan, aspect[h_start:h_end, w_start:w_end])
+                            features[idx, :, :, 3] = np.where(clcd[h_start:h_end, w_start:w_end] == self.nodata_values['clcd'], np.nan, clcd[h_start:h_end, w_start:w_end])
+                            features[idx, :, :, 4] = ndvi_data
+                            features[idx, :, :, 5] = smap_data
+                            for k, var_data in enumerate(era5_data):
+                                features[idx, :, :, 6+k] = var_data[h_start:h_end, w_start:w_end]
+                            features[idx, :, :, 12] = modis_data
+                            times.append(current)
+                            idx += 1
+                        except Exception as e:
+                            logger.warning(f"加载文件失败: {modis_file}, {era5_file}, {smap_file}, {ndvi_file}, 错误: {str(e)}")
+
+                    current += timedelta(hours=1)
+
+                # 添加时间和位置特征
+                if times:
+                    time_features = self.generate_time_features(times, (sub_h, w_end - w_start))
+                    location_features = self.generate_location_features((sub_h, w_end - w_start), is_global=False)
+                    features[:idx, :, :, 13:17] = time_features
+                    features[:idx, :, :, 17:19] = np.broadcast_to(location_features, (idx, sub_h, w_end - w_start, 2))
+                else:
+                    logger.warning(f"子区域 ({i},{j}) 无有效时间点，跳过时间和位置特征生成")
+
+                features = features[:idx]
+                logger.info(f"加载局部数据子区域 ({i},{j}) 完成，目标日期: {target_date}, 实际加载 {idx} 小时，变量: {self.var_names}")
+                subregion_data.append((features, times))
+
+        if not is_pretrain:
+            try:
+                with h5py.File(cache_file, 'w') as f:
+                    for idx, (data, times) in enumerate(subregion_data):
+                        f.create_dataset(f'subregion_{idx}/data', data=data, compression='gzip')
+                        f.create_dataset(f'subregion_{idx}/times', data=[t.isoformat().encode() for t in times])
+                logger.info(f"缓存局部数据: {cache_file}")
+            except Exception as e:
+                logger.error(f"保存缓存失败: {cache_file}, 错误: {str(e)}")
+
+        return subregion_data
+
+    def generate_time_features(self, times, shape):
+        """生成时间特征（month, day, hour, doy）
+        
+        Args:
+            times (list): 时间列表
+            shape (tuple): 空间形状 (height, width)
+        
+        Returns:
+            ndarray: (n_times, height, width, 4)
+        """
+        month = np.array([t.month for t in times])[:, None, None, None]
+        day = np.array([t.day for t in times])[:, None, None, None]
+        hour = np.array([t.hour for t in times])[:, None, None, None]
+        doy = np.array([t.timetuple().tm_yday for t in times])[:, None, None, None]
+        return np.concatenate([
+            np.broadcast_to(month, (len(times), *shape, 1)),
+            np.broadcast_to(day, (len(times), *shape, 1)),
+            np.broadcast_to(hour, (len(times), *shape, 1)),
+            np.broadcast_to(doy, (len(times), *shape, 1))
+        ], axis=-1).astype(np.float32)
+
+    def generate_location_features(self, shape, is_global=True):
+        """生成经纬度特征
+        
+        Args:
+            shape (tuple): 空间形状 (height, width)
+            is_global (bool): 是否为全局网格
+        
+        Returns:
+            ndarray: (height, width, 2)
+        """
+        h, w = shape
+        lon = np.linspace(self.lon_range[0], self.lon_range[1], w)
+        lat = np.linspace(self.lat_range[1], self.lat_range[0], h)
+        lon, lat = np.meshgrid(lon, lat)
+        return np.stack([lon, lat], axis=-1).astype(np.float32)
+
+if __name__ == "__main__":
+    logger.info("开始调试 DataLoader 模块，使用实际数据")
+    config_path = r"G:\CNN_SpatialDownscaling\scripts\Spatio-temporal_Reconstruction\modis_lst_interpolation_code_framework\config.json"
+    try:
+        loader = DataLoader(config_path)
+        target_date = datetime(2018, 1, 15)
+        
+        global_data, global_times = loader.load_global_data(target_date, is_pretrain=False)
+        logger.info(f"全局数据（fine-tune）形状: {global_data.shape}, 时间点数: {len(global_times)}")
+        
+        global_data_pretrain, global_times_pretrain = loader.load_global_data(target_date, is_pretrain=True)
+        logger.info(f"全局数据（预训练）形状: {global_data_pretrain.shape}, 时间点数: {len(global_times_pretrain)}")
+        
+        subregion_data = loader.load_local_data(target_date, is_pretrain=False)
+        for idx, (sub_data, sub_times) in enumerate(subregion_data):
+            logger.info(f"局部数据子区域 {idx}（fine-tune）形状: {sub_data.shape}, 时间点数: {len(sub_times)}")
+        
+
+    except FileNotFoundError as e:
+        logger.error(f"调试失败: {str(e)}")
+    except Exception as e:
+        logger.error(f"调试失败，未知错误: {str(e)}")

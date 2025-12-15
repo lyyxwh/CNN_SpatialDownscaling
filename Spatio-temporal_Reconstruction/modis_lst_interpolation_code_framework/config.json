@@ -1,0 +1,83 @@
+{
+    "global_data_paths": {
+        "dem": "I:\\SRTM_DEM\\2018_0p0625\\SRTM_DEM_resample_clip.img",
+        "slope": "I:\\SRTM_DEM\\2018_0p0625\\SRTM_DEM_resample_clip_slope.img",
+        "aspect": "I:\\SRTM_DEM\\2018_0p0625\\SRTM_DEM_resample_clip_aspect.img",
+        "clcd": "I:\\CLCD\\2018_0p0625\\CLCD_v01_2018__ProjectRaster_clip.tif",
+        "era5": "I:\\CNN_SpatialDownscaling\\Processed_Data_0p0625\\processed_era5",
+        "smap": "I:\\CNN_SpatialDownscaling\\Processed_Data_0p0625\\processed_smap",
+        "cldas": "G:\\cldas\\data\\2018_clip_filtered",
+        "ndvi": "I:\\CNN_SpatialDownscaling\\Processed_Data_0p0625\\processed_ndvi"
+    },
+    "local_data_paths": {
+        "dem_1km": "I:\\SRTM_DEM\\2018_1000\\SRTM_DEM_1000_clip1.img",
+        "slope_1km": "I:\\SRTM_DEM\\2018_1000\\SRTM_DEM_1000_slope_clip1.img",
+        "aspect_1km": "I:\\SRTM_DEM\\2018_1000\\SRTM_DEM_1000_aspect_clip1.img",
+        "clcd_1km": "I:\\CLCD\\2018_1000m\\CLCD_v01_2018_albert_pr_re_clip1.tif",
+        "era5_1km": "I:\\CNN_SpatialDownscaling\\Processed_Data\\processed_era5",
+        "smap_1km": "I:\\CNN_SpatialDownscaling\\Processed_Data\\processed_smap",
+        "modis": "G:\\CNN_SpatialDownscaling\\modis_lst\\2018_mod\\output_hourly_data",
+        "ndvi_1km": "I:\\CNN_SpatialDownscaling\\Processed_Data\\processed_ndvi"
+    },
+    "var_names": {
+        "era5": ["t2m", "ssrd", "strd", "rh", "d2m", "vpd"],
+        "smap": "sm_surface_wetness",
+        "cldas": "TG",
+        "ndvi": "_1_km_16_days_NDVI",
+        "modis": "LST_1km",
+        "time": ["month", "day", "hour", "doy"],
+        "location": ["lat_sin", "lat_cos", "lon_sin", "lon_cos"]
+    },
+    "nodata_values": {
+        "cldas": 0,
+        "clcd": 0,
+        "dem": -32768,
+        "slope": 3.39999995214e+38,
+        "aspect": 3.39999995214e+38,
+        "era5": -9999,
+        "ndvi": -9999,
+        "smap": -9999,
+        "modis": 0
+    },
+
+    
+    "train_params": {
+        "local_finetune": {
+            "freeze_layers": 1,
+            "kl_weight": 0.005,
+            "batch_size": 512,
+            "learning_rate": 0.00005,
+            "epochs": 30,
+            "epochs_debug": 10,
+            "early_stopping_patience": 3
+        }
+    },
+    "data_params":{
+        "time_window": 720,
+        "global_shape": [256, 240],
+        "local_shape": [1921, 1801],
+        "subregion_split": [2, 2],
+        "lon_range": [110, 125],
+        "lat_range": [27, 43],
+        "min_coverage": 0.5,
+        "unified_lst_range": [220, 340]  
+    },
+
+
+    "model_params": {
+        "n_layers": 6,
+        "dropout": 0.1,
+        "learning_rate": 0.0001,
+        "batch_size": 512,
+        "epochs_pretrain": 50,
+        "epochs_finetune": 5,
+        "kl_weight": 0.005,
+        "d_model":512,
+        "n_heads":8,
+
+        "dim_feedforward":1024,
+        "activation":"relu"
+    },
+    "output_dir": "G:\\CNN_SpatialDownscaling\\output"
+
+}
