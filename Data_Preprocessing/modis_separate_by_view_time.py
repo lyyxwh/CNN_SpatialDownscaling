@@ -135,7 +135,7 @@ def process_modis_hourly_data(input_file, output_dir):
         if 'Day_view_time' in ds.data_vars and 'QC_Day' in ds.data_vars:
             day_hours = np.floor(ds['Day_view_time'].values).astype(int)
             day_hour_mask = (day_hours == hour)
-            day_quality_mask = (ds['QC_Day'].values <= 2)
+            day_quality_mask = (ds['QC_Day'].values <= 1)
             day_mask = day_hour_mask & day_quality_mask
             
             if np.sum(day_mask) > 0:
@@ -159,7 +159,7 @@ def process_modis_hourly_data(input_file, output_dir):
         if 'Night_view_time' in ds.data_vars and 'QC_Night' in ds.data_vars:
             night_hours = np.floor(ds['Night_view_time'].values).astype(int)
             night_hour_mask = (night_hours == hour)
-            night_quality_mask = (ds['QC_Night'].values <= 2)
+            night_quality_mask = (ds['QC_Night'].values <= 1)
             night_mask = night_hour_mask & night_quality_mask
 
             if np.sum(night_mask) > 0:

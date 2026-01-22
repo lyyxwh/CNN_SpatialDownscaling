@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 import rasterio
 from rasterio.transform import from_origin
 from scipy.spatial import cKDTree
+from scipy.stats import gaussian_kde
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -275,8 +276,7 @@ class LSTInterpolator:
         logger.info("【插值完成统计】")
         final_valid = np.sum(~np.isnan(final_lst_2d))
         final_nodata = np.sum(np.isnan(final_lst_2d))
-        total = final_lst_2d.size
-        
+        total = final_lst_2d.size        
         logger.info(f"  总像元数: {total}")
         logger.info(f"  有效像元: {final_valid} ({final_valid/total*100:.2f}%)")
         logger.info(f"    - 原始LST: {len(type1_indices)}")
@@ -1070,144 +1070,116 @@ class LSTInterpolator:
     
     def _plot_results(self, result, metrics, output_dir):
         """绘制详细结果图"""
-        fig = plt.figure(figsize=(24, 16))
+        fig = plt.figure(figsize=(24, 8))
         
         dt_str = result['datetime'].strftime('%Y%m%d_%H')
-        vmin, vmax = 220, 340
+        vmin, vmax = 220, 330  # LST 范围
+        type1_indices = result['pixel_classes']['type1_indices']
+        obs = result['lst_original'].flat[type1_indices]
+        pred = result['lst_predicted'].flat[type1_indices]
+
+        valid = ~np.isnan(obs) & ~np.isnan(pred)
+        obs = obs[valid]
+        pred = pred[valid]
+        #如果观测值没有有效点，跳过绘图
+        if len(obs) == 0:
+            logger.warning("无有效观测点，跳过绘图")
+            return
+        xmin, xmax = obs.min(), obs.max()
+        ymin, ymax = pred.min(), pred.max()
+        min_val = min(obs.min(), pred.min())
+        max_val = max(obs.max(), pred.max())
         
-        # 创建2x3网格
-        gs = fig.add_gridspec(2, 3, hspace=0.3, wspace=0.3)
-        
+        # 创建1x3网格，优化图大小和条带一致性
+        gs = fig.add_gridspec(1, 3, hspace=0.3, wspace=0.3, width_ratios=[1, 1, 1])
+
         # 1. 原始MODIS LST
+        logger.info(f'开始绘制原始MODIS LST')
         ax1 = fig.add_subplot(gs[0, 0])
-        im1 = ax1.imshow(result['lst_original'], cmap='RdYlBu_r', vmin=vmin, vmax=vmax)
-        ax1.set_title('原始MODIS LST', fontsize=14, fontweight='bold')
-        ax1.set_xlabel('列')
-        ax1.set_ylabel('行')
-        plt.colorbar(im1, ax=ax1, label='K')
-        
+        im1 = ax1.imshow(result['lst_original'], cmap='RdYlBu_r', vmin=min_val, vmax=max_val,
+                         extent=[110, 125, 27, 43], aspect='auto')
+        ax1.set_title('原始MODIS LST', fontsize=16, fontweight='bold')
+        cbar1 = plt.colorbar(im1, ax=ax1, label='K', fraction=0.046, pad=0.04)
+        cbar1.ax.tick_params(labelsize=14)  # 设置colorbar刻度标签大小
+        cbar1.set_label('K', fontsize=14)  # 设置colorbar标签大小
+        ax1.set_xticks(np.arange(110, 126, 2))
+        ax1.set_yticks(np.arange(28, 44, 2))
+        ax1.set_xticklabels([f'{int(t)}°E' for t in ax1.get_xticks()], fontsize=14)
+        ax1.set_yticklabels([f'{int(t)}°N' for t in ax1.get_yticks()], rotation=90, fontsize=14)
+
         original_valid = np.sum(~np.isnan(result['lst_original']))
         ax1.text(0.02, 0.98, f'有效像元: {original_valid}', 
-                transform=ax1.transAxes, verticalalignment='top',
+                transform=ax1.transAxes, verticalalignment='top', fontsize = 14,
                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
-        
-        # 2. 模型预测LST（仅第2类）
-        ax2 = fig.add_subplot(gs[0, 1])
-        
-        # 创建只显示第2类像元的预测图
-        type2_display = np.full_like(result['lst'], np.nan)
-        type2_indices = result['pixel_classes']['type2_indices']
-        type2_display.flat[type2_indices] = result['lst_predicted'].flat[type2_indices]
-        
-        im2 = ax2.imshow(type2_display, cmap='RdYlBu_r', vmin=vmin, vmax=vmax)
-        ax2.set_title('模型预测LST（仅第2类像元）', fontsize=14, fontweight='bold')
-        ax2.set_xlabel('列')
-        ax2.set_ylabel('行')
-        plt.colorbar(im2, ax=ax2, label='K')
-        
-        ax2.text(0.02, 0.98, f'预测像元: {len(type2_indices)}', 
-                transform=ax2.transAxes, verticalalignment='top',
-                bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.8))
-        
+
         # 3. 最终插值结果
-        ax3 = fig.add_subplot(gs[0, 2])
-        im3 = ax3.imshow(result['lst'], cmap='RdYlBu_r', vmin=vmin, vmax=vmax)
-        ax3.set_title('最终插值LST', fontsize=14, fontweight='bold')
-        ax3.set_xlabel('列')
-        ax3.set_ylabel('行')
-        plt.colorbar(im3, ax=ax3, label='K')
-        
+        logger.info(f'开始最终插值结果')
+        ax3 = fig.add_subplot(gs[0, 1])
+        im3 = ax3.imshow(result['lst'], cmap='RdYlBu_r', vmin=min_val, vmax=max_val,
+                         extent=[110, 125, 27, 43], aspect='auto')
+        ax3.set_title('最终插值LST', fontsize=16, fontweight='bold')
+        cbar3 = plt.colorbar(im3, ax=ax3, label='K', fraction=0.046, pad=0.04)
+        cbar3.ax.tick_params(labelsize=14)  # 设置colorbar刻度标签大小
+        cbar3.set_label('K', fontsize=14)  # 设置colorbar标签大小
+        ax3.set_xticks(np.arange(110, 126, 2))
+        ax3.set_yticks(np.arange(28, 44, 2))
+        ax3.set_xticklabels([f'{int(t)}°E' for t in ax3.get_xticks()], fontsize=14)
+        ax3.set_yticklabels([f'{int(t)}°N' for t in ax3.get_yticks()], rotation=90, fontsize=14)
+
         final_valid = np.sum(~np.isnan(result['lst']))
         ax3.text(0.02, 0.98, f'有效像元: {final_valid}', 
-                transform=ax3.transAxes, verticalalignment='top',
+                transform=ax3.transAxes, verticalalignment='top', fontsize = 14,
                 bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.8))
-        
-        # 4. 像元分类图
-        ax4 = fig.add_subplot(gs[1, 0])
-        
-        # 创建分类图（不同颜色代表不同类别）
-        classification_map = np.zeros_like(result['lst'])
-        classification_map.flat[result['pixel_classes']['type1_indices']] = 1  # 原始LST
-        classification_map.flat[result['pixel_classes']['type2_indices']] = 2  # 模型预测
-        classification_map.flat[result['pixel_classes']['type3_indices']] = 0  # nodata
-        classification_map.flat[result['pixel_classes']['type4_indices']] = 3  # 空间插值
-        
-        # 将nodata设为NaN以使用特殊颜色
-        classification_map = np.where(classification_map == 0, np.nan, classification_map)
-        
-        im4 = ax4.imshow(classification_map, cmap='tab10', vmin=0, vmax=4)
-        ax4.set_title('像元分类图', fontsize=14, fontweight='bold')
-        ax4.set_xlabel('列')
-        ax4.set_ylabel('行')
-        
-        # 自定义colorbar
-        cbar4 = plt.colorbar(im4, ax=ax4)
-        cbar4.set_ticks([1, 2, 3])
-        cbar4.set_ticklabels(['第1类\n(原始)', '第2类\n(预测)', '第4类\n(插值)'])
-        
-        stats_text = (f"第1类: {result['pixel_classes']['type1_count']}\n"
-                     f"第2类: {result['pixel_classes']['type2_count']}\n"
-                     f"第3类: {result['pixel_classes']['type3_count']}\n"
-                     f"第4类: {result['pixel_classes']['type4_count']}")
-        ax4.text(0.02, 0.98, stats_text, transform=ax4.transAxes, 
-                verticalalignment='top', fontsize=10,
-                bbox=dict(boxstyle='round', facecolor='white', alpha=0.9))
-        
-        # 5. 散点图：预测 vs 观测
-        ax5 = fig.add_subplot(gs[1, 1])
-        
+
+        # 5. Hexbin图：预测 vs 观测
+        logger.info(f'开始绘制散点图')
+        ax5 = fig.add_subplot(gs[0, 2])
+        ax5.set_aspect('equal', adjustable='box') # 保持1:1比例
+
         if metrics and metrics['n_points'] > 0:
-            type1_indices = result['pixel_classes']['type1_indices']
-            obs = result['lst_original'].flat[type1_indices]
-            pred = result['lst_predicted'].flat[type1_indices]
             
-            valid = ~np.isnan(obs) & ~np.isnan(pred)
-            obs = obs[valid]
-            pred = pred[valid]
-                        
-            ax5.scatter(obs, pred, alpha=0.5, s=2, c='blue')
-            ax5.plot([vmin, vmax], [vmin, vmax], 'r--', linewidth=2, label='1:1')
-            ax5.set_xlabel('观测LST (K)', fontsize=12)
-            ax5.set_ylabel('预测LST (K)', fontsize=12)
-            ax5.set_title('预测 vs 观测', fontsize=14, fontweight='bold')
+
+            # 使用Hexbin图
+            hexbin = ax5.hexbin(obs, pred, gridsize=200, cmap='jet', mincnt=1)
+            cbar5 = plt.colorbar(hexbin, ax=ax5, label='点密度', fraction=0.046, pad=0.04)
+
+            
+            cbar5.ax.tick_params(labelsize=14)  # 设置colorbar刻度标签大小
+            cbar5.set_label('点密度', fontsize=14)  # 设置colorbar标签大小
+            ax5.plot([min_val, max_val], [min_val, max_val], 'r--', linewidth=2, label='1:1')
+
+            ax5.set_xlim(xmin, xmax)
+            ax5.set_ylim(ymin, ymax)
+            # 设置x和y轴刻度,都以5为间隔
+            x_start = int(np.floor(xmin / 5) * 5)
+            x_end = int(np.ceil(xmax / 5) * 5)
+            y_start = int(np.floor(ymin / 5) * 5)
+            y_end = int(np.ceil(ymax / 5) * 5)
+            ax5.set_xticks(np.arange(x_start, x_end + 1, 5))
+            ax5.set_yticks(np.arange(y_start, y_end + 1, 5))
+
+            # 设置颜色条标签            
+            ax5.set_xlim(xmin, xmax)
+            ax5.set_ylim(ymin, ymax)
+            ax5.set_xlabel('观测LST (K)', fontsize=14)
+            ax5.set_ylabel('预测LST (K)', fontsize=14)
+            ax5.set_title('预测 vs 观测', fontsize=16, fontweight='bold')
+            ax5.tick_params(axis='both', labelsize=14)  # 设置x、y轴刻度标签大小
             ax5.grid(True, alpha=0.3)
             ax5.legend()
-            
+
             text = (f"RMSE: {metrics['rmse']:.4f} K\n"
                    f"MAE: {metrics['mae']:.4f} K\n"
                    f"$R^2$: {metrics['r2']:.4f}\n"
                    f"Bias: {metrics['bias']:.4f} K\n"
                    f"N: {metrics['n_points']}")
             ax5.text(0.05, 0.95, text, transform=ax5.transAxes,
-                    verticalalignment='top', fontsize=10,
+                    verticalalignment='top', fontsize=14,
                     bbox=dict(boxstyle='round', facecolor='white', alpha=0.9))
         else:
             ax5.text(0.5, 0.5, '无观测点评估', ha='center', va='center',
                     transform=ax5.transAxes, fontsize=14)
         
-        # 6. 残差分布
-        ax6 = fig.add_subplot(gs[1, 2])
-        
-        if metrics and metrics['n_points'] > 0:
-            type1_indices = result['pixel_classes']['type1_indices']
-            obs = result['lst_original'].flat[type1_indices]
-            pred = result['lst_predicted'].flat[type1_indices]
-            
-            valid = ~np.isnan(obs) & ~np.isnan(pred)
-            residuals = pred[valid] - obs[valid]
-            
-            ax6.hist(residuals, bins=50, alpha=0.7, edgecolor='black', color='steelblue')
-            ax6.axvline(0, color='r', linestyle='--', linewidth=2, label='零线')
-            ax6.axvline(np.mean(residuals), color='orange', linestyle='--', 
-                       linewidth=2, label=f'均值={np.mean(residuals):.2f}K')
-            ax6.set_xlabel('残差 (预测 - 观测, K)', fontsize=12)
-            ax6.set_ylabel('频数', fontsize=12)
-            ax6.set_title('残差分布', fontsize=14, fontweight='bold')
-            ax6.legend()
-            ax6.grid(True, alpha=0.3)
-        else:
-            ax6.text(0.5, 0.5, '无残差数据', ha='center', va='center',
-                    transform=ax6.transAxes, fontsize=14)
         
         # 保存图片
         plot_path = os.path.join(output_dir, f'lst_interpolation_{dt_str}.png')
@@ -1219,48 +1191,48 @@ class LSTInterpolator:
 def main():
     """主函数"""
     config_path = r"G:\CNN_SpatialDownscaling\scripts\Spatio-temporal_Reconstruction\modis_lst_interpolation_code_framework\config.json"
-    local_finetune_dir = r"G:\CNN_SpatialDownscaling\output\local_finetune"
+    local_finetune_dir = r"G:\CNN_SpatialDownscaling\output\local_finetune_121"
     
     try:
         interpolator = LSTInterpolator(config_path, local_finetune_dir)
-        
-        # 测试参数
-        test_date = datetime(2018, 1, 1).date()
+        for day in [24]:  # range(1, 32):
+            # 测试参数
+            test_date = datetime(2018, 4, day).date()
 
-        for test_hour in range(24):
-            dt_str = test_date.strftime("%Y%m%d") + f"_{test_hour:02d}"
-        
-            logger.info(f"开始测试插值: {test_date} {test_hour:02d}:00")
+            for test_hour in range(24):
+                dt_str = test_date.strftime("%Y%m%d") + f"_{test_hour:02d}"
             
-            # 执行插值
-            result = interpolator.interpolate_hourly(test_date, test_hour)
-            
-            # 保存结果
-            output_dir = os.path.join(os.path.dirname(config_path), '../output/interpolation_v8')
-            os.makedirs(output_dir, exist_ok=True)
-            
-            # 保存NetCDF
-            nc_path = os.path.join(output_dir, f'lst_{test_date.strftime("%Y%m%d")}_{test_hour:02d}.nc')
-            interpolator.save_netcdf(result, nc_path)
-            
-            # 保存GeoTIFF
-            gtiff_paths = interpolator.save_geotiff(result, output_dir, prefix=dt_str)
-            
-            # 评估并绘图
-            metrics = interpolator.evaluate_and_plot(result, output_dir)
-            
-            # 输出最终总结
-            logger.info("【插值任务完成】")
-            logger.info(f"NetCDF文件: {nc_path}")
-            logger.info(f"GeoTIFF文件: {gtiff_paths}")
-            
-            if metrics:
-                logger.info(f"\n模型预测精度:")
-                logger.info(f"  RMSE: {metrics['rmse']:.4f} K")
-                logger.info(f"  MAE: {metrics['mae']:.4f} K")
-                logger.info(f"  R²: {metrics['r2']:.4f}")
-                logger.info(f"  Bias: {metrics['bias']:.4f} K")
-                logger.info(f"  评估点数: {metrics['n_points']}")
+                logger.info(f"开始测试插值: {test_date} {test_hour:02d}:00")
+                
+                # 执行插值
+                result = interpolator.interpolate_hourly(test_date, test_hour)
+                
+                # 保存结果
+                output_dir = os.path.join(os.path.dirname(config_path), '../output/interpolation_v8')
+                os.makedirs(output_dir, exist_ok=True)
+                
+                # 保存NetCDF
+                nc_path = os.path.join(output_dir, f'lst_{test_date.strftime("%Y%m%d")}_{test_hour:02d}.nc')
+                interpolator.save_netcdf(result, nc_path)
+                
+                # 保存GeoTIFF
+                gtiff_paths = interpolator.save_geotiff(result, output_dir, prefix=dt_str)
+                
+                # 评估并绘图
+                metrics = interpolator.evaluate_and_plot(result, output_dir)
+                
+                # 输出最终总结
+                logger.info("【插值任务完成】")
+                logger.info(f"NetCDF文件: {nc_path}")
+                logger.info(f"GeoTIFF文件: {gtiff_paths}")
+                
+                if metrics:
+                    logger.info(f"\n模型预测精度:")
+                    logger.info(f"  RMSE: {metrics['rmse']:.4f} K")
+                    logger.info(f"  MAE: {metrics['mae']:.4f} K")
+                    logger.info(f"  R²: {metrics['r2']:.4f}")
+                    logger.info(f"  Bias: {metrics['bias']:.4f} K")
+                    logger.info(f"  评估点数: {metrics['n_points']}")
         
         
     except Exception as e:

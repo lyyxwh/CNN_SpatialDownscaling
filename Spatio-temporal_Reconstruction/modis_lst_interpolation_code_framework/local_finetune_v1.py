@@ -53,7 +53,7 @@ console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
 # 设置matplotlib中文字体
-plt.rcParams['font.sans-serif'] = ['SimHei', 'DejaVu Sans']
+plt.rcParams['font.sans-serif'] = ['Times New Roman','SimHei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 
 class LocalFineTuner:
@@ -141,6 +141,8 @@ class LocalFineTuner:
             fit_features=False,
             fit_target=False
         )
+        # 固定随机种子，保证划分可复现
+        split_generator = torch.Generator().manual_seed(42)
         
         # 数据集划分
         if is_debug:
@@ -154,7 +156,16 @@ class LocalFineTuner:
             train_size = int(0.8 * total_size)
             val_size = total_size - train_size
         
-        train_dataset, val_dataset = random_split(local_dataset, [train_size, val_size])
+        # 替代 random_split 的数据集分割逻辑
+        indices = np.arange(len(local_dataset))
+        np.random.shuffle(indices)
+
+        train_indices = indices[:train_size]
+        val_indices = indices[train_size:train_size + val_size]
+
+        train_dataset = Subset(local_dataset, train_indices)
+        val_dataset = Subset(local_dataset, val_indices)
+
         logger.info(f"数据集划分: 训练集 {len(train_dataset)}, 验证集 {len(val_dataset)}")
         
         # 处理Subset中的Embedding Layer获取
@@ -226,8 +237,8 @@ class LocalFineTuner:
              
                 
             # 收集数据用于计算 Epoch 级指标 (避免 Batch 级 R2 错误)
-            all_preds.extend(outputs.detach().cpu().numpy())
-            all_targets.extend(targets.detach().cpu().numpy())
+            # all_preds.extend(outputs.detach().cpu().numpy())
+            # all_targets.extend(targets.detach().cpu().numpy())
                 
             progress_bar.set_postfix({'loss': f"{loss.item():.4f}", 'MSE': f"{mse_loss.item():.4f}", 'KL': f"{kl_loss.item():.4f}"})
                 
@@ -236,6 +247,7 @@ class LocalFineTuner:
         avg_mse_loss = total_mse_loss / len(train_loader)
         avg_kl_loss = total_kl_loss / len(train_loader)
             
+        '''       
         # 统一反归一化并计算真实物理指标
         target_scaler = scaler_dict['target']
         preds_denorm = target_scaler.inverse_transform(np.array(all_preds).reshape(-1, 1)).flatten()
@@ -243,9 +255,9 @@ class LocalFineTuner:
             
         train_rmse = np.sqrt(mean_squared_error(targets_denorm, preds_denorm))
         train_mae = mean_absolute_error(targets_denorm, preds_denorm)
-        train_r2 = r2_score(targets_denorm, preds_denorm)
+        train_r2 = r2_score(targets_denorm, preds_denorm)'''
             
-        return avg_loss, avg_mse_loss, avg_kl_loss, train_mae, train_r2, train_rmse
+        return avg_loss, avg_mse_loss, avg_kl_loss  #, train_mae, train_r2, train_rmse
     
 
     def evaluate(self, model, data_loader, criterion, scaler_dict, desc="Validation"):
@@ -326,7 +338,7 @@ class LocalFineTuner:
         optimizer = optim.Adam(local_model.parameters(), lr=self.finetune_params['learning_rate'])
         
         
-        # 直接使用恒定学习率进行微调，效果更好
+        # 使用恒定学习率进行微调
         
         kl_weight = self.finetune_params['kl_weight']
         num_epochs = self.finetune_params['epochs_debug'] if is_debug else self.finetune_params['epochs']
@@ -351,9 +363,9 @@ class LocalFineTuner:
         
         for epoch in range(num_epochs):
             # 1. 训练阶段
-            train_loss, train_mse, train_kl, train_mae, train_r2, train_true_mse = self.train_epoch(
+            train_loss, train_mse, train_kl = self.train_epoch(
                 local_model, global_model, train_loader, optimizer, criterion, scaler_dict, epoch, kl_weight
-            )
+            )#, train_mae, train_r2, train_true_mse
             
             # 2. 验证阶段 (传入描述信息以显示进度条)
             val_metrics, val_preds, val_targets = self.evaluate(
@@ -365,9 +377,9 @@ class LocalFineTuner:
             history['train_loss'].append(train_loss)
             history['train_mse'].append(train_mse)
             history['train_kl'].append(train_kl)
-            history['train_mae'].append(train_mae)  
+            '''history['train_mae'].append(train_mae)  
             history['train_r2'].append(train_r2)  
-            history['train_true_mse'].append(train_true_mse)  
+            history['train_true_mse'].append(train_true_mse)  '''
             history['val_loss'].append(val_loss)
             history['val_rmse'].append(val_metrics['rmse'])
             history['val_r2'].append(val_metrics['r2'])
@@ -377,7 +389,7 @@ class LocalFineTuner:
             # 3. 打印详细日志 (每一轮都打印)
             logger.info(f"Epoch {epoch+1:02d}/{num_epochs}: "
                         f"Train Loss={train_loss:.6f} (MSE={train_mse:.6f}, KL={train_kl:.6f}) | "
-                        f"Train RMSE={np.sqrt(train_true_mse):.4f}K, Train MSE={train_true_mse:.4f}K, Train MAE={train_mae:.4f}K, Train R²={train_r2:.4f} | "
+                       # f"Train RMSE={np.sqrt(train_true_mse):.4f}K, Train MSE={train_true_mse:.4f}K, Train MAE={train_mae:.4f}K, Train R²={train_r2:.4f} | "
                         f"Val Loss={val_loss:.6f}, Val MSE={val_metrics['true_mse']:.4f}K, Val MAE={val_metrics['mae']:.4f}K , "
                         f"Val RMSE={val_metrics['rmse']:.4f}K, Val R²={val_metrics['r2']:.4f}")
             
@@ -431,7 +443,7 @@ class LocalFineTuner:
         plot_hexbin_scatter(
             all_val_targets, all_val_preds,
             os.path.join(output_dir, f'local_finetune_{file_prefix}_hexbin.png'),
-            title=f'Local Finetune {target_date.strftime("%Y-%m-%d")} (Hexbin)',
+            title=f'Local Finetune {target_date.strftime("%Y-%m-%d")} ',
             xlabel='Original LST (K)', 
             ylabel='Predicted LST (K)'
         )
@@ -448,6 +460,7 @@ class LocalFineTuner:
         # 清理
         gc.collect()
         torch.cuda.empty_cache()
+
         
         return final_model_path
 
@@ -462,7 +475,7 @@ if __name__ == "__main__":
         finetuner = LocalFineTuner(config_path, global_pretrain_dir, local_finetune_dir)
         
         # 测试日期
-        test_dates = [datetime(2018, 7, day) for day in [1, 15]]
+        test_dates = [datetime(2018, 5, day) for day in [31]]
         
         for test_date in test_dates:
             logger.info(f"\n{'='*50}")

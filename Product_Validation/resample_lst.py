@@ -13,13 +13,12 @@ def create_output_filename(original_filenames: List[str]) -> str:
     # 以第一个文件名进行解析
     original_filename = original_filenames[0]
     # 匹配 LST_日期_时间_UTC
-    # 注意：我们假设所有同一时间点的文件前缀都是相同的 LST_YYYYMMDD_HHMMSS_UTC
-    match = re.match(r'LST_(\d{8})_(\d{6})_UTC', original_filename, re.IGNORECASE)
+    match = re.match(r'(\d{8})_(\d{2})_LST', original_filename, re.IGNORECASE)
     
     if match:
         date_str = match.group(1) # 20181003
         time_str = match.group(2) # 024030
-        return f'Landsat8_LST_{date_str}_{time_str}_UTC.tif'
+        return f'LST_{date_str}_{time_str}_UTC.tif'
     else:
         # 如果格式不匹配，使用一个通用的名称
         return f'Landsat8_LST_Merged_Resampled_{len(original_filenames)}_Files.tif'
@@ -81,7 +80,7 @@ def group_files_by_time(file_list: List[str]) -> Dict[str, List[str]]:
     根据 LST_日期_时间_UTC 字符串将文件分组。
     """
     groups = {}
-    pattern = re.compile(r'(LST_\d{8}_\d{6}_UTC)')
+    pattern = re.compile(r'(\d{8}_\d{2}_LST)')
     
     for filename in file_list:
         match = pattern.search(filename)
@@ -176,11 +175,11 @@ def main():
     print("\n🎉 所有时间组处理完毕!")
 
 if __name__ == "__main__":
-    INPUT_DIR = r'G:\CNN_SpatialDownscaling\scripts\Spatio-temporal_Reconstruction\output\interpolation_v5\20181006_03_LST.tif'  # 原始LST文件所在的目录
-    OUTPUT_DIR = r'G:\CNN_SpatialDownscaling\20181006_03_LST.tif' # 处理后的文件输出目录
+    INPUT_DIR = r'G:\CNN_SpatialDownscaling\scripts\Spatio-temporal_Reconstruction\output\interpolation_v8'  # 原始LST文件所在的目录
+    OUTPUT_DIR = r'G:\CNN_SpatialDownscaling\output\interpolation_v8' # 处理后的文件输出目录
     TARGET_RESOLUTION = 0.0625  # 目标分辨率 (度)0.0083333333
     
-    resample_and_rename(INPUT_DIR, OUTPUT_DIR, TARGET_RESOLUTION)
+    main()
     '''# --- 配置参数 ---
     INPUT_DIR = r'D:\lyygi\Downloads\drive-download-20251117T064059Z-1-001'  # 原始LST文件所在的目录
     OUTPUT_DIR = r'D:\lyygi\Downloads\drive-download-20251117T064059Z-1-001\output_lst1' # 处理后的文件输出目录

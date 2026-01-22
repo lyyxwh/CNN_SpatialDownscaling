@@ -691,13 +691,13 @@ class GlobalPretrainer:
             title_prefix=f'{month_str} Global Pretrain'
         )
         plot_hexbin_scatter(np.array(all_test_targets), np.array(all_test_outputs),
-                        os.path.join(self.output_dir, f"global_pretrain_{month_str}_hexbin1.png"),
-                        title='Model Validation (Hexbin)',
+                        os.path.join(self.output_dir, f"global_pretrain_{month_str}_hexbin.png"),
+                        title='Global_Pretrain '+month_str,
                         xlabel='Reference LST (K)',
                         ylabel='Predicted LST (K)',
-                        figsize=(8, 8), gridsize=100)
+                        figsize=(8, 8), gridsize=200)
         plot_scatter(np.array(all_test_targets), np.array(all_test_outputs),
-                        os.path.join(self.output_dir, f"global_pretrain_{month_str}_scatter1.png"),
+                        os.path.join(self.output_dir, f"global_pretrain_{month_str}_scatter.png"),
                         month_str,dpi=300)
 
         return model, metrics
@@ -843,7 +843,7 @@ if __name__ == "__main__":
     try:
         # 创建预训练器
         pretrainer = GlobalPretrainer(config_path, output_dir)
-        for month in [9, 10]:#range(3, 4):
+        for month in [1, 7]:#range(3, 4):
             target_date = datetime(2018, month, 15)
             logger.info(f"\n{'='*50}")
             logger.info(f"开始训练第 {month} 月模型")

@@ -17,15 +17,15 @@ data_paths = {
         #'slope': 'I:\\SRTM_DEM\\2018_1000\\SRTM_DEM_resample_clip_slope.img', 
         #'aspect': 'I:\\SRTM_DEM\\2018_1000\\SRTM_DEM_resample_clip_aspect.img',
         #'clcd': 'I:\\CLCD\\2018_1000m\\CLCD_v01_2018__ProjectRaster_clip1.tif',
-        'era5': 'I:\\CNN_SpatialDownscaling\\ERA5\\ERA5_1000',
-        #'smap': 'G:\\CNN_SpatialDownscaling\\201712and201901\\SMAP201712\\output_clip_re_1000_nc',
-        'modis': r'G:\CNN_SpatialDownscaling\MODIS11\2018_mod11\output_hourly_data',
+        'era5': r'G:\\CNN_SpatialDownscaling\\201712and201901\\ERA5_1000',
+        #'smap': r'G:\CNN_SpatialDownscaling\SMAP\SPL4SMGP\SMAP\output_clip_resample_nc',
+        'modis': r'G:\CNN_SpatialDownscaling\modis_lst\2018_mod\output_hourly_data',
         #'ndvi': 'G:\\CNN_SpatialDownscaling\\201712and201901\\ndvi\\2019'
 }
 
 # 变量名字典，用于从 NetCDF 文件中提取特定变量
 var_names = {
-    'era5': ['t2m', 'ssrd_flux', 'net_radiation_flux', 'vpd', 'd2m', 'rh'],
+    'era5': ['t2m', 'ssrd', 'strd', 'vpd', 'd2m', 'rh'],
     'smap': 'sm_surface_wetness',
     'cldas': 'TG',
     'ndvi': '_1_km_16_days_NDVI',

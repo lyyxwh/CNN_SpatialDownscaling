@@ -64,9 +64,9 @@ def merge_nc_folders(folder1, folder2, output_folder):
 
 
 if __name__ == "__main__":
-    input_dir1 = r"G:\CNN_SpatialDownscaling\modis_lst\2018_mod\output_hourly_data"
-    input_dir2 = r"G:\CNN_SpatialDownscaling\modis_lst\2018_myd\output_hourly_data"
-    output_dir = r"G:\CNN_SpatialDownscaling\modis_lst\2018_mod\merge"
+    input_dir1 = r"G:\CNN_SpatialDownscaling\modis_lst\2018_mod1\output_hourly_data"
+    input_dir2 = r"G:\CNN_SpatialDownscaling\modis_lst\2018_myd1\output_hourly_data"
+    output_dir = r"G:\CNN_SpatialDownscaling\modis_lst\2018_mod1\merge"
 
     merge_nc_folders(input_dir1, input_dir2, output_dir)
 

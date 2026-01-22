@@ -14,8 +14,8 @@
         "slope_1km": "I:\\SRTM_DEM\\2018_1000\\SRTM_DEM_1000_slope_clip1.img",
         "aspect_1km": "I:\\SRTM_DEM\\2018_1000\\SRTM_DEM_1000_aspect_clip1.img",
         "clcd_1km": "I:\\CLCD\\2018_1000m\\CLCD_v01_2018_albert_pr_re_clip1.tif",
-        "era5_1km": "I:\\CNN_SpatialDownscaling\\Processed_Data\\processed_era5",
-        "smap_1km": "I:\\CNN_SpatialDownscaling\\Processed_Data\\processed_smap",
+        "era5_1km": "I:\\CNN_SpatialDownscaling\\Processed_Data1\\processed_era5",
+        "smap_1km": "I:\\CNN_SpatialDownscaling\\Processed_Data1\\processed_smap",
         "modis": "G:\\CNN_SpatialDownscaling\\modis_lst\\2018_mod\\output_hourly_data",
         "ndvi_1km": "I:\\CNN_SpatialDownscaling\\Processed_Data\\processed_ndvi"
     },
@@ -43,7 +43,7 @@
     
     "train_params": {
         "local_finetune": {
-            "freeze_layers": 1,
+            "freeze_layers": 2,
             "kl_weight": 0.005,
             "batch_size": 512,
             "learning_rate": 0.00005,

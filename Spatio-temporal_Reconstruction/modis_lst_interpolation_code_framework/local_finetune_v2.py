@@ -46,7 +46,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 # 设置matplotlib中文字体
-plt.rcParams['font.sans-serif'] = ['SimHei', 'DejaVu Sans']
+plt.rcParams['font.sans-serif'] = ['Times New Roman','SimHei', 'DejaVu Sans']
 plt.rcParams['axes.unicode_minus'] = False
 
 class LocalFineTuner:
@@ -221,6 +221,8 @@ class LocalFineTuner:
         logger.info(f"✓ 局部数据集scaler_dict键: {list(local_dataset.scaler_dict.keys())}")
         logger.info(f"✓ 确认使用全局target scaler (mean={scaler_dict['target'].mean_[0]:.2f}K)")
         
+        # 固定随机种子，保证划分可复现
+        split_generator = torch.Generator().manual_seed(42)
         # 4. 数据集划分
         if is_debug:
             # 调试模式下使用10%的数据集
@@ -235,7 +237,7 @@ class LocalFineTuner:
             train_size = int(0.8 * total_size)
             val_size = total_size - train_size
         
-        train_dataset, val_dataset = random_split(local_dataset, [train_size, val_size])
+        train_dataset, val_dataset = random_split(local_dataset, [train_size, val_size], generator=split_generator)
         
         logger.info(f"数据集划分: 训练 {len(train_dataset)}, 验证 {len(val_dataset)}")
         
@@ -441,7 +443,7 @@ class LocalFineTuner:
         )
         plot_hexbin_scatter(val_targets_denorm, 
                             val_preds_denorm, 
-                            os.path.join(output_dir, f'local_finetune_{file_prefix}_scatter2.png'),
+                            os.path.join(output_dir, f'local_finetune_{file_prefix}_hexbin.png'),
                             title=f'Local Fine-tuning {target_date.strftime("%Y-%m-%d")}',
                             xlabel='Original LST (K)', 
                             ylabel='Predicted LST (K)'
@@ -449,7 +451,7 @@ class LocalFineTuner:
         # 如果需要更多点，建议使用 plot_model_scatter 时传入小样本或改成避免再次推理。当前用采样数据生成密度图，避免OOM。
         plot_model_scatter(local_model, val_loader, pretrain_scaler_dict, 
                            file_prefix,
-                           os.path.join(output_dir, f'local_finetune_{file_prefix}_scatter3.png'),                           
+                           os.path.join(output_dir, f'local_finetune_{file_prefix}_scatter.png'),                           
                            xlabel='Original LST (K)', 
                            ylabel='Predicted LST (K)',
                            dpi=300
@@ -469,15 +471,15 @@ if __name__ == "__main__":
     # 请根据您的实际路径修改以下配置
     config_path = r"G:\CNN_SpatialDownscaling\scripts\Spatio-temporal_Reconstruction\modis_lst_interpolation_code_framework\config.json"
     global_pretrain_dir = r"G:\CNN_SpatialDownscaling\output\global_pretrain4"
-    local_finetune_dir = r"G:\CNN_SpatialDownscaling\output\local_finetune_1205"
+    local_finetune_dir = r"G:\CNN_SpatialDownscaling\output\local_finetune_ValidationData"
     
     try:
         # 示例日期
         #test_date = datetime(2018, 1, 15)
         
-        for day in [1, 15]:#range(1, 32):  # 1 到 31 日
+        for day in [6]:#range(1, 32):  # 1 到 31 日
 
-            test_date = datetime(2018, 7, day)
+            test_date = datetime(2018, 10, day)
 
             finetuner = LocalFineTuner(config_path, global_pretrain_dir, local_finetune_dir)
             logger.info(f"开始对 {test_date.strftime('%Y-%m-%d')} 进行局部微调")

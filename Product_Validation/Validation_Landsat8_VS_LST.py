@@ -1,8 +1,13 @@
 import rasterio
+from rasterio.warp import reproject
+from rasterio.enums import Resampling
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 import warnings
+import glob
+import re
+import csv
 
 # 忽略 rasterio 内部可能产生的UserWarning，例如 CRS 标识符差异导致的警告
 warnings.filterwarnings("ignore", category=UserWarning, module="rasterio")
@@ -31,24 +36,48 @@ def validate_lst_data(landsat_path, validation_path, output_dir="."):
             landsat_crs = src_landsat.crs
             landsat_shape = src_landsat.shape
         
-        with rasterio.open(validation_path) as src_val:
+        # 若验证文件为 netCDF，使用 NETCDF:...:TG 打开子数据集
+        val_open_path = validation_path
+        if validation_path.lower().endswith('.nc'):
+            val_open_path = f"NETCDF:{validation_path}:TG"
+
+        with rasterio.open(val_open_path) as src_val:
             val_nodata = src_val.nodata
             val_transform = src_val.transform
             val_crs = src_val.crs
-            
+
+            # 如果验证数据没有 CRS，猜测为 EPSG:4326（纬度/经度）并给出提示
+            if val_crs is None:
+                print(f"⚠️ 注意：验证数据无 CRS，假定为 EPSG:4326（请确认）。")
+                val_crs = rasterio.crs.CRS.from_epsg(4326)
+
             # --- 2. 坐标系和分辨率检查 (作为警告) ---
             if landsat_crs != val_crs:
                 print(f"❌ 警告：坐标系不匹配！Landsat: {landsat_crs}, 验证数据: {val_crs}")
-            
-            res_match = np.isclose(landsat_transform[0], val_transform[0]) and \
-                        np.isclose(landsat_transform[4], val_transform[4])
-            if not res_match:
-                 print("❌ 警告：分辨率似乎不匹配，可能会导致像元对齐错误！")
 
-            # --- 3. 使用 Landsat 的地理边界在验证数据上读取窗口 ---
-            
-            window = src_val.window(*src_landsat.bounds)
-            val_lst_cropped = src_val.read(1, window=window)
+            # 将验证栅格重投影/重采样到 Landsat 的网格 (transform + shape)，以保证像元一一对应
+            dst_shape = landsat_shape
+            dst_transform = landsat_transform
+            dst_crs = landsat_crs
+
+            # 准备目标数组
+            dst_dtype = src_val.dtypes[0] if src_val.dtypes else 'float32'
+            val_lst_cropped = np.empty(dst_shape, dtype=dst_dtype)
+
+            # 执行重投影
+            try:
+                reproject(
+                    source=rasterio.band(src_val, 1),
+                    destination=val_lst_cropped,
+                    src_transform=src_val.transform,
+                    src_crs=val_crs,
+                    dst_transform=dst_transform,
+                    dst_crs=dst_crs,
+                    resampling=Resampling.bilinear
+                )
+            except Exception as e:
+                print(f"❌ 错误：在重投影验证数据时失败：{e}")
+                return None
             
     except rasterio.RasterioIOError as e:
         print(f"❌ 错误：无法打开或读取文件。错误信息: {e}")
@@ -166,52 +195,99 @@ def main():
     """
     主函数：配置并运行单个文件的验证。
     """
-    print(f"--- 遥感 LST 验证工具启动：单文件调试模式 ---")
+    print("--- 遥感 LST 验证工具启动：批量模式 ---")
 
     # =======================================================
-    # >>> 调试设置：请在这里修改您的文件路径 <<<
+    # >>> 批处理设置：修改以下 Landsat 文件夹 与 验证文件夹 <<<
     # =======================================================
-    
-    # 示例 Landsat 文件路径
-    landsat_file = r'D:\lyygi\Downloads\drive-download-20251117T064059Z-1-001\output_lst1\Landsat8_LST_20181006_031126_UTC.tif'
-    # 示例待验证文件路径
-    validation_file = r'G:\CNN_SpatialDownscaling\20181006_03_LST.tif' 
-    
-    # >>> 新增：指定图片输出目录 <<<
-    # 例如，保存到 D 盘的 "Validation_Output" 文件夹
+    landsat_dir = r'D:\lyygi\Downloads\drive-download-20251117T064059Z-1-001\output_lst'
+    validation_dir = r'G:\CNN_SpatialDownscaling\scripts\Spatio-temporal_Reconstruction\output\interpolation_v8'#G:\CNN_SpatialDownscaling\scripts\Spatio-temporal_Reconstruction\output\interpolation_v8   G:\cldas\data\2018_clip_filtered'
     image_output_directory = r'G:\CNN_SpatialDownscaling\scripts\Product_Validation\output\Validation2'
-    
+    summary_csv = os.path.join(image_output_directory, 'validation_summary_0p0083333.csv')
     # =======================================================
-    # >>> 调试设置结束 <<<
-    # =======================================================
-    
-    l_path = os.path.abspath(landsat_file)
-    v_path = os.path.abspath(validation_file)
-    
-    if not os.path.isfile(l_path):
-        print(f"❌ 错误：Landsat 文件不存在: {l_path}")
-        return
-        
-    if not os.path.isfile(v_path):
-        print(f"❌ 错误：验证文件不存在: {v_path}")
+
+    os.makedirs(image_output_directory, exist_ok=True)
+
+    # Helper: 从 Landsat 文件名提取日期和小时（返回 YYYYMMDD, HH）
+    def parse_landsat_datehour(fname):
+        b = os.path.basename(fname)
+        # 常见模式：YYYYMMDD_HHMMSS 或 YYYYMMDDHHMMSS
+        m = re.search(r'(\d{8})[_-]?(\d{6})', b)
+        if m:
+            date = m.group(1)
+            hour = m.group(2)[:2]
+            return date, hour
+        # 备用：只查找 8 位日期和单独小时
+        m2 = re.search(r'(\d{8})[_-]?(\d{2})', b)
+        if m2:
+            return m2.group(1), m2.group(2)
+        return None, None
+
+    landsat_files = sorted(glob.glob(os.path.join(landsat_dir, '*.tif')))
+    if len(landsat_files) == 0:
+        print(f"❌ 错误：未在目录找到任何 .tif 文件: {landsat_dir}")
         return
 
-    print("\n--- 模式：单文件验证 ---")
-    print(f"Landsat 文件: {l_path}")
-    print(f"验证文件:   {v_path}")
-    print(f"图片保存目录: {os.path.abspath(image_output_directory)}")
-    
-    # 执行单个文件验证，并传递输出目录
-    results = validate_lst_data(l_path, v_path, output_dir=image_output_directory)
-    
-    if results and results.get("N", 0) > 0:
-        print("\n--- 验证结果 ---")
-        print(f"RMSE (均方根误差): {results['RMSE']:.4f}")
-        print(f"MB (平均偏差):      {results['MB']:.4f}")
-        print(f"R² (决定系数):      {results['R2']:.4f}")
-        print(f"有效像元数 (N):   {results['N']}")
-    elif results:
-        print("\n❌ 验证失败：无有效像元进行计算。")
+    summary_rows = []
+
+    for lfp in landsat_files:
+        date, hour = parse_landsat_datehour(lfp)
+        if date is None:
+            print(f"⚠️ 跳过：无法从文件名解析时间 -> {lfp}")
+            continue
+
+        # 构造可能的验证文件名（优先精确匹配），例如 20181006_03_LST.tif 或 CLDAS_20181006_03.nc
+        candidate_names = [
+            f"{date}_{hour}_LST.tif",
+            f"{date}_{int(hour)}_LST.tif",
+            f"CLDAS_{date}_{hour}.nc",
+            f"CLDAS_{date}_{int(hour)}.nc",
+            f"CLDAS_{date}_{hour}.tif",
+            f"CLDAS{date}_{int(hour)}.tif",
+            f"LST_{date}_{hour}_UTC.tif",
+            f"LST_{date}_{int(hour)}_UTC.tif"
+        ]
+        matched_val = None
+        for cname in candidate_names:
+            vpath = os.path.join(validation_dir, cname)
+            if os.path.isfile(vpath):
+                matched_val = vpath
+                break
+
+        # 退而求其次：模糊匹配包含日期和小时的任何文件（例如不同命名规则或扩展名）
+        if matched_val is None:
+            pattern1 = os.path.join(validation_dir, f"*{date}*_{hour}*")
+            pattern2 = os.path.join(validation_dir, f"*{date}*{hour}*")
+            candidates = glob.glob(pattern1) + glob.glob(pattern2)
+            if candidates:
+                matched_val = candidates[0]
+            else:
+                print(f"⚠️ 未找到匹配验证文件: {date}_{hour}  对于 {os.path.basename(lfp)}")
+                continue
+        
+        print(f"\n--- 处理: {os.path.basename(lfp)} \n 对应验证文件: {os.path.basename(matched_val)}")
+
+        res = validate_lst_data(os.path.abspath(lfp), os.path.abspath(matched_val), output_dir=image_output_directory)
+        row = {
+            'landsat_file': os.path.basename(lfp),
+            'validation_file': os.path.basename(matched_val),
+            'N': None, 'RMSE': None, 'MB': None, 'R': None, 'R2': None, 'T_A_mean': None, 'T_B_mean': None
+        }
+        if res:
+            row.update({k: res.get(k) for k in ['N','RMSE','MB','R','R2','T_A_mean','T_B_mean']})
+        summary_rows.append(row)
+
+    # 保存汇总 CSV
+    if summary_rows:
+        with open(summary_csv, 'w', newline='', encoding='utf-8') as cf:
+            fieldnames = ['landsat_file','validation_file','N','RMSE','MB','R','R2','T_A_mean','T_B_mean']
+            writer = csv.DictWriter(cf, fieldnames=fieldnames)
+            writer.writeheader()
+            for r in summary_rows:
+                writer.writerow(r)
+        print(f"\n🗂️ 汇总结果已保存: {summary_csv}")
+    else:
+        print("\n⚠️ 未生成任何验证结果，检查匹配规则与输入文件。")
 
 
 if __name__ == "__main__":

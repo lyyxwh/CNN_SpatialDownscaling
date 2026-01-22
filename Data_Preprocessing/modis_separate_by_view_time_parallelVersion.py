@@ -131,7 +131,7 @@ def process_modis_hourly_data(input_file, output_dir):
         # 原始掩码：观测小时匹配 & 质量阈值
         base_hours = np.floor(view_vals).astype(int)
         base_hour_mask_all = np.isfinite(view_vals)  # 有效 view_time 的基础掩码
-        quality_mask = (qc_vals <= 2)
+        quality_mask = (qc_vals <= 1)
 
         if lon_arr is None:
             # 无经度信息：直接当作 UTC 处理（不变）
@@ -314,17 +314,17 @@ if __name__ == "__main__":
     print("MODIS数据按小时分离与质量筛选工具 (并行版本，逐文件写入)")
     print("="*50)
     
-    input_dir = "G:\\CNN_SpatialDownscaling\\201712and201901\\MOD11\\2017" # 注意这里从 MYD11 变成了 MOD11
-    output_dir = r"G:\CNN_SpatialDownscaling\modis_lst\2018_mod\output_hourly_data1" # 注意这里从 MYD11 变成了 MOD11
+    input_dir = "G:\\CNN_SpatialDownscaling\\201712and201901\\MOD11\\2017" 
+    output_dir = r"G:\CNN_SpatialDownscaling\modis_lst\2018_mod1\output_hourly_data1" 
 
-    input_dir1 = "G:\\CNN_SpatialDownscaling\\201712and201901\\MYD11\\2017" # 注意这里从 MYD11 变成了 MOD11
-    output_dir1 = r"G:\CNN_SpatialDownscaling\modis_lst\2018_myd\output_hourly_data1" # 注意这里从 MYD11 变成了 MOD11
-    '''
+    input_dir1 = "G:\\CNN_SpatialDownscaling\\201712and201901\\MYD11\\2017" 
+    output_dir1 = r"G:\CNN_SpatialDownscaling\modis_lst\2018_myd1\output_hourly_data1" 
+    
     input_dir2 = r"D:\rawdata\MOD11\2018"
-    output_dir2 = r"G:\CNN_SpatialDownscaling\modis_lst\2018_mod\output_hourly_data"
+    output_dir2 = r"G:\CNN_SpatialDownscaling\modis_lst\2018_mod1\output_hourly_data"
 
     input_dir3 = r"D:\rawdata\MYD11\2018"
-    output_dir3 = r"G:\CNN_SpatialDownscaling\modis_lst\2018_myd\output_hourly_data"'''
+    output_dir3 = r"G:\CNN_SpatialDownscaling\modis_lst\2018_myd1\output_hourly_data"
 
 
     if not os.path.exists(input_dir):
@@ -338,10 +338,10 @@ if __name__ == "__main__":
             print(f"\n{os.path.basename(input_dir)}所有任务处理完毕。")
             batch_process_modis_data(input_dir1, output_dir1)
             print(f"\n{os.path.basename(input_dir1)}所有任务处理完毕。")
-            '''
+            
             batch_process_modis_data(input_dir2, output_dir2)
             print(f"\n{os.path.basename(input_dir2)}所有任务处理完毕。")
             batch_process_modis_data(input_dir3, output_dir3)
-            print(f"\n{os.path.basename(input_dir3)}所有任务处理完毕。")'''
+            print(f"\n{os.path.basename(input_dir3)}所有任务处理完毕。")
         except Exception as e:
             print(f"批处理过程中出现错误: {e}")

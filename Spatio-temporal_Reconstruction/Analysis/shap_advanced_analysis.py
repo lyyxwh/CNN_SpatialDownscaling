@@ -36,31 +36,25 @@ class SHAPAdvancedAnalyzer:
         
         # 特征中文名映射
         self.feature_names_zh = {
-            't2m': '2m temperature',
-            'ssrd': 'Surface solar radiation downwards',
-            # 【修改】strd -> net_radiation_flux
-            'net_radiation_flux': 'Surface Net Radiation',
-            'rh': 'Relative humidity',
-            'd2m': '2m dewpoint temperature',
-            'vpd': 'Vapor pressure deficit',
-            'sm_surface_wetness': 'Surface soil moisture',
+            't2m':  '2m temperature', # '2米温度',
+            'ssrd':  'Surface solar radiation downwards',#'短波辐射(太阳短波辐射向下通量)',
+            # 【修改】strd -> strd
+            'strd': 'Surface thermal radiation downwards', #'地表向下热辐射',
+            'rh': 'Relative humidity',# '相对湿度',
+            'd2m': 'dewpoint temperature',#'露点温度',
+            'vpd': 'Vapor pressure deficit',# '水汽压差',
+            'sm_surface_wetness': 'Surface soil moisture',#'表层土壤湿度',
             '_1_km_16_days_NDVI': 'NDVI',
-            'dem': 'Elevation',
-            'slope': 'Slope',
-            'aspect': 'Aspect',
-            'clcd': 'Land cover',
-            # 时间特征 【修改】移除 month_sin, month_cos
-            'day_sin': 'Day',
-            'day_cos': 'Day',
-            'hour_sin': 'Hour',
-            'hour_cos': 'Hour',
-            'doy_sin': 'Day of Year',
-            'doy_cos': 'Day of Year',
-            # 地理特征(合并显示)
-            'lat_sin': 'Latitude',
-            'lat_cos': 'Latitude',
-            'lon_sin': 'Longitude',
-            'lon_cos': 'Longitude'
+            'dem': 'Elevation',#'高程',
+            'slope': 'Slope',#'坡度',
+            'aspect': 'Aspect',#'坡向',
+            'clcd': 'Land cover',# '土地覆盖',
+            # 【修改】移除 month
+            'day': 'Day',
+            'hour': 'Hour',
+            'doy': 'Day of Year',
+            'lat': 'Latitude',
+            'lon': 'Longitude'
         }
     
     # ... (后续方法如 plot_dependence_plots 等保持不变，它们通过 feature_names_zh 获取名称，已自动适配)
@@ -245,7 +239,7 @@ class SHAPAdvancedAnalyzer:
         
         # 准备数据
         data_list = []
-        for idx in top_indices:
+        for idx in range(len(top_indices)):
             feature_name = feature_names[idx]
             feature_name_zh = self.feature_names_zh.get(
                 feature_name.replace('_sin', '').replace('_cos', ''),
@@ -316,7 +310,7 @@ class SHAPAdvancedAnalyzer:
             top_indices = np.argsort(abs_shap)[-10:][::-1]
             
             top_shap = sample_shap[top_indices]
-            top_names = [feature_names_zh[i] for i in top_indices]
+            top_names = [feature_names_zh[i] for i in range(len(top_indices))]
             
             # 计算累积和
             cumsum = np.cumsum(np.concatenate([[base_value], top_shap]))
@@ -412,22 +406,22 @@ class SHAPAdvancedAnalyzer:
                                f'{height:.1f}%',
                                ha='center', va='bottom', fontsize=9)
         
-        # 特征重要性Top10对比
-        global_importance = global_results['importance_df'].head(10)
-        local_importance = local_results['importance_df'].head(10)
+        # 特征重要性Top17对比
+        global_importance = global_results['importance_df'].head(17)
+        local_importance = local_results['importance_df'].head(17)
         
-        y_pos = np.arange(10)
+        y_pos = np.arange(17)
         
         axes[1].barh(y_pos - 0.2, global_importance['Importance'].values, 0.4,
-                    label='全局模型', color='#FF6B6B', alpha=0.8)
+                    label='Global Model', color="lightpink", alpha=0.8)
         axes[1].barh(y_pos + 0.2, local_importance['Importance'].values, 0.4,
-                    label='局部模型', color='#4ECDC4', alpha=0.8)
-        
+                    label='Local Model', color="#4EA5CD", alpha=0.8)
+
         axes[1].set_yticks(y_pos)
-        axes[1].set_yticklabels(global_importance['Feature_ZH'].values)
-        axes[1].set_xlabel('平均绝对SHAP值', fontsize=12)
-        axes[1].set_title('全局 vs 局部模型 - Top10特征重要性对比',
-                         fontsize=14, fontweight='bold')
+        axes[1].set_yticklabels(global_importance['Display_Name'].values)
+        axes[1].set_xlabel('Mean Absolute SHAP Value', fontsize=12)
+        #axes[1].set_title('Global vs Local Model - Top17 Feature Importance Comparison',
+                         #fontsize=14, fontweight='bold')
         axes[1].legend()
         axes[1].invert_yaxis()
         axes[1].grid(True, alpha=0.3, axis='x')
@@ -441,6 +435,66 @@ class SHAPAdvancedAnalyzer:
         plt.close()
         
         logger.info("模型对比图已保存")
+
+    def plot_featureimportance_comparison(self, global_results, local_results, output_prefix):
+        """
+        绘制全局模型和局部模型的特征重要性对比图
+
+        Args:
+            global_results: 全局模型分析结果
+            local_results: 局部模型分析结果
+            output_prefix: 输出前缀
+        """
+        # 设置画布大小
+        fig, ax = plt.subplots(figsize=(10, 8))
+        # 数据源贡献对比
+        global_source = global_results['source_df']
+        local_source = local_results['source_df']
+        
+        # 确保两个DataFrame有相同的数据源
+        all_sources = sorted(set(global_source['Source'].tolist() + 
+                                local_source['Source'].tolist()))
+        
+        global_contrib = []
+        local_contrib = []
+        
+        for source in all_sources:
+            global_val = global_source[global_source['Source'] == source]['Percentage'].values
+            local_val = local_source[local_source['Source'] == source]['Percentage'].values
+            
+            global_contrib.append(global_val[0] if len(global_val) > 0 else 0)
+            local_contrib.append(local_val[0] if len(local_val) > 0 else 0)
+
+         # 绘制对比图 
+        # 特征重要性Top17对比
+        global_importance = global_results['importance_df'].head(17)
+        local_importance = local_results['importance_df'].head(17)
+        
+        y_pos = np.arange(17)
+        
+        ax.barh(y_pos - 0.2, global_importance['Importance'].values, 0.4,
+                    label='Global Model', color="lightpink", alpha=0.8)
+        ax.barh(y_pos + 0.2, local_importance['Importance'].values, 0.4,
+                    label='Local Model', color="#4EA5CD", alpha=0.8)
+
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(global_importance['Display_Name'].values)
+        ax.set_xlabel('Mean Absolute SHAP Value', fontsize=12)
+        #ax.set_title('Global vs Local Model - Top17 Feature Importance Comparison',
+                         #fontsize=14, fontweight='bold')
+        ax.legend()
+        ax.invert_yaxis()
+        ax.grid(True, alpha=0.3, axis='x')
+
+        plt.tight_layout()
+        plt.savefig(
+            os.path.join(self.output_dir, f'{output_prefix}_FeatureImportance_comparison.png'),
+            dpi=600,
+            bbox_inches='tight'
+        )
+        plt.close()
+        
+        logger.info("模型对比图已保存") 
     
     def generate_report(self, results, output_prefix):
         """
@@ -475,7 +529,7 @@ class SHAPAdvancedAnalyzer:
             
             importance_df = results['importance_df'].head(20)
             for idx, row in importance_df.iterrows():
-                f.write(f"{idx+1:2d}. {row['Feature_ZH']:15s} "
+                f.write(f"{idx+1:2d}. {row['Display_Name']:15s} "
                        f"[{row['Source']:8s}] - "
                        f"重要性: {row['Importance']:.6f}\n")
             
@@ -494,7 +548,7 @@ class SHAPAdvancedAnalyzer:
             f.write(f"合计贡献度为{total_contrib:.1f}%\n\n")
             
             top_feature = importance_df.iloc[0]
-            f.write(f"3. 最重要的单个特征是{top_feature['Feature_ZH']},")
+            f.write(f"3. 最重要的单个特征是{top_feature['Display_Name']},")
             f.write(f"来自{top_feature['Source']}数据源\n\n")
         
         logger.info(f"分析报告已保存: {report_path}")
@@ -511,38 +565,61 @@ def main():
     # 示例代码(需要根据实际路径调整)
     try:
         base_dir = r"G:\CNN_SpatialDownscaling\output\shap_analysis"
-        
-        # 加载全局模型结果
-        global_shap = np.load(os.path.join(base_dir, 'global', 'global_201801_shap_values.npy'))
-        global_importance = pd.read_csv(os.path.join(base_dir, 'global', 'global_201801_feature_importance.csv'))
-        global_source = pd.read_csv(os.path.join(base_dir, 'global', 'global_201801_source_contribution.csv'))
-        
-        # 加载局部模型结果
-        local_shap = np.load(os.path.join(base_dir, 'local', 'local_20180101_shap_values.npy'))
-        local_importance = pd.read_csv(os.path.join(base_dir, 'local', 'local_20180101_feature_importance.csv'))
-        local_source = pd.read_csv(os.path.join(base_dir, 'local', 'local_20180101_source_contribution.csv'))
-        
-        # 构建结果字典
-        global_results = {
-            'shap_values': global_shap,
-            'importance_df': global_importance,
-            'source_df': global_source
-        }
-        
-        local_results = {
-            'shap_values': local_shap,
-            'importance_df': local_importance,
-            'source_df': local_source
-        }
-        
-        # 对比分析
-        analyzer.compare_models(global_results, local_results, 'global_vs_local')
-        
-        # 生成报告
-        analyzer.generate_report(global_results, 'global_201801')
-        analyzer.generate_report(local_results, 'local_20180101')
-        
-        logger.info("高级分析完成!")
+        for month in ['01', '07']:
+            # 加载全局模型结果
+            global_shap = np.load(os.path.join(base_dir, 'global', f'global_2018{month}_shap_values.npy'))
+            global_importance = pd.read_csv(os.path.join(base_dir, 'global', f'global_2018{month}_feature_importance.csv'))
+            global_source = pd.read_csv(os.path.join(base_dir, 'global', f'global_2018{month}_source_contribution.csv'))
+            
+            # 加载局部模型结果
+            local_shap = np.load(os.path.join(base_dir, 'local', f'local_2018{month}15_shap_values.npy'))
+            local_importance = pd.read_csv(os.path.join(base_dir, 'local', f'local_2018{month}15_feature_importance.csv'))
+            local_source = pd.read_csv(os.path.join(base_dir, 'local', f'local_2018{month}15_source_contribution.csv'))
+
+            # 构建结果字典
+            global_results = {
+                'shap_values': global_shap,
+                'importance_df': global_importance,
+                'source_df': global_source
+            }
+            
+            local_results = {
+                'shap_values': local_shap,
+                'importance_df': local_importance,
+                'source_df': local_source
+            }
+            
+            # 对比分析
+            analyzer.compare_models(global_results, local_results, f'{month}_global_vs_local')
+            analyzer.plot_featureimportance_comparison(global_results, local_results, f'{month}_global_vs_local')
+            analyzer.plot_violin_plots(global_shap, global_results['shap_values'], global_importance['Display_Name'].tolist(), 
+                                      f'global_2018{month}_violin', top_n=10)
+            analyzer.plot_violin_plots(local_shap, local_results['shap_values'], local_importance['Display_Name'].tolist(), 
+                                      f'local_2018{month}15_violin', top_n=10)
+            analyzer.plot_waterfall_charts(global_shap, global_results['shap_values'], global_importance['Display_Name'].tolist(),
+                                         base_value=0, output_prefix=f'global_2018{month}_waterfall', n_samples=3)
+            analyzer.plot_waterfall_charts(local_shap, local_results['shap_values'], local_importance['Display_Name'].tolist(),
+                                         base_value=0, output_prefix=f'local_2018{month}15_waterfall', n_samples=3)
+            
+            '''analyzer.plot_force_plots(global_shap, global_results['shap_values'], global_importance['Display_Name'].tolist(), 
+                                      f'global_2018{month}_force', 10)
+            analyzer.plot_force_plots(local_shap, local_results['shap_values'], local_importance['Display_Name'].tolist(), 
+                                      f'local_2018{month}15_force', 10)
+            analyzer.plot_dependence_plots(global_shap, global_results['shap_values'], global_importance['Display_Name'].tolist(), 
+                                         f'global_2018{month}_dependence', top_n=6)
+            analyzer.plot_dependence_plots(local_shap, local_results['shap_values'], local_importance['Display_Name'].tolist(), 
+                                         f'local_2018{month}15_dependence', top_n=6)
+            analyzer.plot_interaction_heatmap(None, global_importance['Display_Name'].tolist(), 
+                                            f'global_2018{month}_interaction', top_n=15)
+            analyzer.plot_interaction_heatmap(None, local_importance['Display_Name'].tolist(),   
+                                            f'local_2018{month}15_interaction', top_n=15)
+           '''
+            
+            # 生成报告
+            analyzer.generate_report(global_results, f'global_2018{month}')
+            analyzer.generate_report(local_results, f'local_2018{month}15')
+            
+            logger.info("高级分析完成!")
         
     except FileNotFoundError as e:
         logger.warning(f"文件未找到: {e}")

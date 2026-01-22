@@ -7,11 +7,13 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import logging
 import torch
 from datetime import datetime
+import matplotlib.ticker as ticker
+from matplotlib.colors import LogNorm
 
 # 设置日志
 logger = logging.getLogger(__name__)
 
-def set_plot_style(font_sans=['SimHei','Arial', 'DejaVu Sans']):
+def set_plot_style(font_sans=['Times New Roman', 'Arial', 'SimHei','DejaVu Sans']):
     """
     设置符合学术出版要求的全局绘图风格
     """
@@ -54,9 +56,12 @@ def plot_density_scatter(y_true, y_pred, output_path,
                          ylabel='Predicted LST (K)',
                          figsize=(8, 8),
                          dpi=300,
-                         sample_threshold=50000):
+                         sample_threshold=1000,
+                         xlim=None,
+                         ylim=None):
     """
     绘制符合学术标准的密度散点图（优化版）
+    可选：xlim, ylim = (min, max) 自定义坐标轴范围
     
     Args:
         y_true: 真实值
@@ -106,8 +111,12 @@ def plot_density_scatter(y_true, y_pred, output_path,
                          cmap=cmap, alpha=0.8, edgecolors='none', rasterized=True)
     
     # 1:1 参考线
-    min_val = min(targets.min(), predictions.min())
-    max_val = max(targets.max(), predictions.max())
+    if xlim is not None or ylim is not None:
+        min_val = min(xlim[0], ylim[0])
+        max_val = max(xlim[1], ylim[1])
+    else:
+        min_val = min(targets.min(), predictions.min())
+        max_val = max(targets.max(), predictions.max())
     # 留一点边距
     margin = (max_val - min_val) * 0.05
     min_ax = min_val - margin
@@ -117,22 +126,29 @@ def plot_density_scatter(y_true, y_pred, output_path,
     
     # 5. 统计文本框
     stats_text = (f'N = {n_samples}\n'
-                  f'Bias = {bias:.2f}\n'
-                  f'RMSE = {rmse:.2f}\n'
-                  f'MAE = {mae:.2f}\n'
-                  f'$R^2$ = {r2:.4f}')
+                  f'Bias = {bias:.3f}\n'
+                  f'RMSE = {rmse:.3f}\n'
+                  f'MAE = {mae:.3f}\n'
+                  f'$R^2$ = {r2:.3f}')
     
     props = dict(boxstyle='round', facecolor='white', alpha=0.9, edgecolor='gray', linewidth=0.5)
-    ax.text(0.05, 0.95, stats_text, transform=ax.transAxes, fontsize=12,
+    ax.text(0.05, 0.95, stats_text, transform=ax.transAxes, fontsize=18,
             verticalalignment='top', bbox=props, family='monospace')
     
     # 6. 装饰
-    ax.set_xlabel(xlabel, fontsize=14, weight='bold')
-    ax.set_ylabel(ylabel, fontsize=14, weight='bold')
-    ax.set_title(title, fontsize=16, weight='bold', pad=15)
+    ax.set_xlabel(xlabel, fontsize=16, weight='bold')
+    ax.set_ylabel(ylabel, fontsize=16, weight='bold')
+    ax.tick_params(axis='both', labelsize=16)  # 设置x、y轴刻度标签大小
     
-    ax.set_xlim(min_ax, max_ax)
-    ax.set_ylim(min_ax, max_ax)
+    # 使用用户指定范围或自动计算范围
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    else:
+        ax.set_xlim(min_ax, max_ax)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+    else:
+        ax.set_ylim(min_ax, max_ax)
     ax.set_aspect('equal', adjustable='box')
     ax.grid(True, alpha=0.3, linestyle='--')
     
@@ -360,7 +376,7 @@ def plot_hexbin_scatter(y_true, y_pred, output_path,
                         title='Model Validation (Hexbin)',
                         xlabel='Reference LST (K)',
                         ylabel='Predicted LST (K)',
-                        figsize=(8, 8), gridsize=100):
+                        figsize=(8, 8), gridsize=200):
     """
     Hexbin图：适合超大规模数据的密度可视化，速度极快。
     """
@@ -368,41 +384,59 @@ def plot_hexbin_scatter(y_true, y_pred, output_path,
     y_true = np.array(y_true).flatten()
     y_pred = np.array(y_pred).flatten()
     mask = ~(np.isnan(y_true) | np.isnan(y_pred))
-    targets = y_true[mask]
-    predictions = y_pred[mask]
-    
-    # 计算指标
+    targets = y_true[mask]  # 仅保留非NaN的真实值
+    predictions = y_pred[mask]  # 仅保留非NaN的预测值
+
+    # 计算评估指标：均方根误差（RMSE）和决定系数（R2）
     from sklearn.metrics import mean_squared_error, r2_score
-    rmse = np.sqrt(mean_squared_error(targets, predictions))
-    r2 = r2_score(targets, predictions)
+    rmse = np.sqrt(mean_squared_error(targets, predictions))  # 计算RMSE
+    r2 = r2_score(targets, predictions)  # 计算R2
     
     fig, ax = plt.subplots(figsize=figsize)
     
     # 核心：使用 hexbin 代替 scatter
     # bins='log' 可以让低密度区域也能看清，避免高密度区域掩盖一切
-    hb = ax.hexbin(targets, predictions, gridsize=gridsize, cmap='jet', bins='log', mincnt=1)
+    hb = ax.hexbin(targets, predictions, gridsize=gridsize, cmap='jet', mincnt=1, norm=LogNorm())
     
     # 1:1 线
     min_val = min(targets.min(), predictions.min())
     max_val = max(targets.max(), predictions.max())
-    ax.plot([min_val, max_val], [min_val, max_val], 'k--', linewidth=1.5)
+    # 留一点边距
+    margin = (max_val - min_val) * 0.05
+    ax.plot([min_val - margin, max_val + margin], 
+            [min_val - margin, max_val + margin], 
+            'k--', linewidth=1.5, label='1:1 Line')
+
     
     # 统计信息
-    stats_text = f'N={len(targets)}\nRMSE={rmse:.2f}\n$R^2$={r2:.4f}\nMAE={mean_absolute_error(targets, predictions):.2f}'
+
+    stats_text = (f'N = {len(targets)}\n'
+                  f'RMSE = {rmse:.2f} K\n'
+                  f'$R^2$ = {r2:.4f}\n'
+                  f'MAE = {mean_absolute_error(targets, predictions):.2f} K')
     ax.text(0.05, 0.95, stats_text, transform=ax.transAxes, va='top', fontsize=12)
     
+    # 6. Colorbar 设置 (自动化管理)
+    # LogNorm 会自动让刻度显示为 10^0, 10^1, 10^2... 
     cb = plt.colorbar(hb, ax=ax)
-    cb.set_label('$log_{10}^(Count)$', rotation=270, labelpad=15)
+    cb.set_label('Count', rotation=270, labelpad=20, fontsize=12)
     
-    ax.set_xlabel(xlabel, fontsize=12)
-    ax.set_ylabel(ylabel, fontsize=12)
-    ax.set_title(title, fontsize=14)
-    ax.set_aspect('equal')
-    ax.grid(True, alpha=0.2)
-    
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    plt.close()
+    # 设置图表的标签和标题
+    ax.set_xlabel(xlabel, fontsize=14)  # 设置x轴标签
+    ax.set_ylabel(ylabel, fontsize=14)  # 设置y轴标签
+    ax.set_title(title, fontsize=16)  # 设置图表标题
+    ax.set_aspect('equal')  # 设置坐标轴比例相等
+    ax.grid(True, alpha=0.2)  # 添加网格线
+    ax.grid(True, alpha=0.3, linestyle='--')
+    ax.set_xlim(min_val - margin, max_val + margin)
+    ax.set_ylim(min_val - margin, max_val + margin)
+    ax.tick_params(axis='both', labelsize=14)  # 设置x、y轴刻度标签大小
+    # 确保输出目录存在并保存图表
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)  # 创建输出目录（如果不存在）
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')  # 保存图表为文件
+    plt.close()  # 关闭图表以释放内存
+
+    # 记录日志，提示图表已保存
     logger.info(f"Hexbin图已保存: {output_path}")
 
 
@@ -588,4 +622,4 @@ def plot_scatter(targets, outputs, output_dir, file_prefix, dpi=600):
         
         logger.info(f"预测-实际散点图已保存到: {output_dir}")
         plt.close()
-    
+
